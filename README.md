@@ -15,6 +15,7 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
 env.local
 
+```bash
 PORT=4000
 UrlDB=mongodb+srv://admin:admin@gamecust.w6kezsh.mongodb.net/?retryWrites=true&w=majority
 JWT_ACCESS_SECRET=gamevxnncust-access
@@ -25,3 +26,4 @@ SMTP_USER=gamecustx@gmail.com
 SMTP_PASSWORD=ondlfyrgexbwashg
 API_URL=http://localhost:4000
 CLIENT_URL=http://localhost:3000
+```
