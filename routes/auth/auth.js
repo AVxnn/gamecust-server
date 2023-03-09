@@ -11,13 +11,15 @@ const jsonParser = bodyParser.json()
 const router = express.Router()
 
 router.post('/user/registration',
+    body('username').isLength({min: 3, max: 24}),  
     body('email').isEmail(),
-    body('password').isLength({min: 3, max: 32}),  
+    body('password').isLength({min: 3, max: 32}),
     UserController.registration)
 router.post('/user/login', UserController.login)
 router.post('/user/logout', UserController.logout)
 router.get('/user/activate/:link', UserController.activate)
 router.get('/user/refresh', UserController.refresh)
 router.get('/user/getUsers', authMiddleware, UserController.getUsers)
+router.get('/user/getUser/:id', UserController.getUser)
 
 export default router;

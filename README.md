@@ -22,8 +22,8 @@ JWT_ACCESS_SECRET=gamevxnncust-access
 JWT_REFRESH_SECRET=gamevxnncust-refresh
 SMTP_HOST="smtp.gmail.com"
 SMTP_PORT=587
-SMTP_USER=gamecustx@gmail.com
-SMTP_PASSWORD=ondlfyrgexbwashg
+SMTP_USER=george@thevann.ru
+SMTP_PASSWORD=g1hcjptjplayg69hackge
 API_URL=http://localhost:4000
 CLIENT_URL=http://localhost:3000
 ```

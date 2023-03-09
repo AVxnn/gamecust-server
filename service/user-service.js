@@ -7,14 +7,16 @@ import UserDto from '../dtos/user-dto.js';
 import ApiError from '../exceptions/api-error.js';
 
 class UserService {
-    async registration(email, password) {
+    async registration(username, email, password) {
         const candidate = await User.findOne({email});
         if(candidate) {
             throw ApiError.BadRequest(`Пользователь с таким email ${email} уже существует!`)
         }
         const hashPassword = await bcrypt.hash(password, 5)
         const activationLink = v4()
-        const user = await User.create({email, password: hashPassword, activationLink})
+        const rating = 0
+        console.log(username);
+        const user = await User.create({username, rating, email, password: hashPassword, activationLink})
         await SendEmail(email, `${process.env.API_URL}/api/user/activate/${activationLink}`);
 
         const userDto = new UserDto(user); // id email isActivated
@@ -77,6 +79,12 @@ class UserService {
     async getAllUsers() {
         const users = await User.find();
         return users;
+    }
+
+    async getUser(username) {
+        const user = await User.findOne({username: {$regex: new RegExp(`^${username}$`, 'i')}});
+        console.log(user);
+        return user;
     }
 }
 
