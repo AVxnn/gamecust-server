@@ -3,19 +3,19 @@ import mongoose from 'mongoose';
 import Post from '../../models/post/post.js';
 import bodyParser from 'body-parser';
 import dotenv from 'dotenv';
+import {v4} from 'uuid'
 dotenv.config();
 
 const jsonParser = bodyParser.json()
 
 const router = express.Router()
-
+    
 // просмотр определенного поста
 router.get('/post/getPost/:id', async (req, res) => {
     const {id} = req.params
     console.log(id);
     try {
-        const post = await Post.findById(id).select('-__v')
-
+        const post = await Post.findOne({id: {$regex: new RegExp(`^${id}$`, 'i')}});
         console.log(post);
 
         await res.json(post)
@@ -39,17 +39,21 @@ router.get('/post/getPosts', async (req, res) => {
 
 // создание
 router.post('/post/create', jsonParser, async (req, res) => {
-    const {title, description, username, userAvatar} = req.body
-    console.log(title, req.body);
+    const {data} = req.body
+    const personalId = v4()
+    console.log(data);
     try {
         const article = new Post({
-            title: title,
-            description: description,
-            username: username,
-            userAvatar: userAvatar,
-            tags: [],
+            title: data.title,
+            description: data.description,
+            username: data.username,
+            userAvatar: data.userAvatar,
+            id: personalId,
+            data: data.data,
+            stared: data.stared,
+            tags: data.tags,
             images: [],
-            hashtags: [],
+            hashtags: data.hashtags,
             likes: [],
             comments: [],
             viewsCount: 0,

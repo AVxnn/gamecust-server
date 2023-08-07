@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 const { Schema, model } = mongoose;
 
-const postSchema = new Schema({
+const imageSchema = new Schema({
     title: String,
     description: String,
     username: String,
@@ -14,7 +14,7 @@ const postSchema = new Schema({
         title: String,
         color: String,
     }],
-    images: [String],
+    image: String,
     hashtags: [String],
     likes: [{
         username: String,
@@ -30,5 +30,5 @@ const postSchema = new Schema({
     viewsCount: Number,
 });
 
-const Post = model('Post', postSchema);
-export default Post;
+const Image = model('Image', imageSchema);
+export default Image;
