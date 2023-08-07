@@ -15,7 +15,7 @@ router.get('/post/getPost/:id', async (req, res) => {
     const {id} = req.params
     console.log(id);
     try {
-        const post = await Post.findOne({id: {$regex: new RegExp(`^${id}$`, 'i')}});
+        const post = await Post.findOne({postId: {$regex: new RegExp(`^${id}$`, 'i')}});
         console.log(post);
 
         await res.json(post)
@@ -40,7 +40,6 @@ router.get('/post/getPosts', async (req, res) => {
 // создание
 router.post('/post/create', jsonParser, async (req, res) => {
     const {data} = req.body
-    const personalId = v4()
     console.log(data);
     try {
         const article = new Post({
@@ -48,7 +47,7 @@ router.post('/post/create', jsonParser, async (req, res) => {
             description: data.description,
             username: data.username,
             userAvatar: data.userAvatar,
-            id: personalId,
+            postId: data.postId,
             data: data.data,
             stared: data.stared,
             tags: data.tags,
@@ -87,24 +86,44 @@ router.delete('/post/delete/:id', async (req, res) => {
 })
 
 // редактирование
-router.put('/post/update/:id', async (req, res) => {
-    const {id} = req.params;
-    const {title = '', description = '', username = '', userAvatar = ''} = req.body
-    console.log(title, req.body);
+router.post('/post/update/:id', async (req, res) => {
+    const {data} = req.body
     try {
-        const post = await Post.findByIdAndUpdate({_id: id}, {
-            title: title,
-            description: description,
-            username: username,
-            userAvatar: userAvatar,
-            tags: [],
+        const post = await Post.findOneAndUpdate({postId: data.postId}, {
+            username: data.username,
+            userAvatar: data.userAvatar,
+            userId: data.userId,
+            published: data.published,
+            postId: data.postId,
+            data: data.data,
+            stared: data.stared,
+            tags: data.tags,
             images: [],
-            hashtags: [],
+            hashtags: data.hashtags,
             likes: [],
             comments: [],
             viewsCount: 0,
           })
-
+        if (!post) {
+            const article = new Post({
+                username: data.username,
+                userAvatar: data.userAvatar,
+                userId: data.userId,
+                published: data.published,
+                postId: data.postId,
+                data: data.data,
+                stared: data.stared,
+                tags: data.tags,
+                images: [],
+                hashtags: data.hashtags,
+                likes: [],
+                comments: [],
+                viewsCount: 0,
+            })
+            await article.save()
+            console.log('create', article);
+        }
+        console.log('put', post);
         res.status(200)
         res.json({
             title: 'Пост обновлен'
