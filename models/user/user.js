@@ -6,7 +6,7 @@ const userSchema = new Schema({
         type: String,
         required: true
     },
-    rating: {
+    level: {
         type: Number
     },
     email: {
@@ -25,6 +25,15 @@ const userSchema = new Schema({
     activationLink: {
         type: String,
     },
+    description: {
+        type: String,
+    },
+    subscribers: {
+        type: Array,
+    },
+    subscriptions : {
+        type: Array,
+    }
      
 });
 

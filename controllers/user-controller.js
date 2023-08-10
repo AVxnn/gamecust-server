@@ -53,6 +53,17 @@ class UserController {
         }
     }
 
+    async addSubscriptions(req, res, next) {
+        try {
+            const {id, uId} = req.body;
+            console.log(id, uId);
+            const userData = await userService.addSubscriptions(id, uId);
+            return res.json(userData);
+        } catch (error) {
+            next(error);
+        }
+    }
+
     async refresh(req, res, next) {
         try {
             const {refreshToken} = req.cookies;
@@ -76,13 +87,17 @@ class UserController {
     async getUser(req, res, next) {
         try {
             const id = req.params.id;
-            console.log('id', id);
             const user = await userService.getUser(id);
-            console.log('user', user)
             return res.json(user);
         } catch (error) {
             next(error);
         }
+    }
+    async getUserId(req, res, next) {
+        const id = req.params.id;
+        const user = await userService.getUserId(id);
+        console.log('userID', user)
+        return res.json(user);
     }
 }
 

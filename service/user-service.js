@@ -36,6 +36,31 @@ class UserService {
 
     }
 
+    async addSubscribers(id, data) {
+        const user = await User.findOne({activationLink})
+        if(!user) {
+            throw ApiError.BadRequest(`Неккоректная ссылка активации`)
+        }
+        user.isActivated = true;
+        await user.save()
+
+    }
+
+    async addSubscriptions(id, uId) {
+        let user = await User.findOne({_id: id})
+        let uIduser = await User.findOne({_id: uId})
+        if(uIduser.subscriptions.filter(e => e == id).length) {
+            user.subscribers = user.subscribers.filter(e => e != uId)
+            uIduser.subscriptions = uIduser.subscriptions.filter(e => e != id)
+        } else {
+            user.subscribers.push(uId);
+            uIduser.subscriptions.push(id);
+        }
+        console.log(user.subscribers, uIduser.subscriptions);
+        await user.save()
+        await uIduser.save()
+    }
+
     async login(email, password) {
         const user = await User.findOne({email});
         if(!user) {
@@ -84,6 +109,12 @@ class UserService {
     async getUser(username) {
         const user = await User.findOne({username: {$regex: new RegExp(`^${username}$`, 'i')}});
         console.log(user);
+        return user;
+    }
+
+    async getUserId(id) {
+        const user = await User.findOne({_id: id});
+        console.log('idw', user);
         return user;
     }
 }
