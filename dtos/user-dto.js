@@ -2,7 +2,7 @@ export default class UserDto {
     email;
     id;
     isActivation;
-    rating;
+    level;
     username;
 
     constructor(model) {
@@ -10,6 +10,8 @@ export default class UserDto {
         this.email = model.email;
         this.id = model._id;
         this.isActivated = model.isActivated;
-        this.rating = model.rating;
+        this.level = model.rating;
+        this.subscribers = model.subscribers;
+        this.subscriptions = model.subscriptions;
     }
 }

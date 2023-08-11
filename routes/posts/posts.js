@@ -25,10 +25,24 @@ router.get('/post/getPost/:id', async (req, res) => {
     }
 })
 
+router.get('/post/getPosts/filter/:filterParams', async (req, res) => {
+    const {filterParams} = req.params
+    console.log(filterParams);
+    try {
+        const post = await Post.find({userId: {$regex: new RegExp(`^${filterParams}$`, 'i')}}).sort({publishedDate: -1});
+        console.log(post);
+
+        await res.json(post)
+    } catch (error) {
+        res.status(404)
+        res.json(`Такой идентификатор не найден попробуйте другой`)
+    }
+})
+
 // просмотр всех постов
 router.get('/post/getPosts', async (req, res) => {
     try {
-        const posts = await Post.find()
+        const posts = await Post.find({ published: true}).sort({publishedDate: -1})
 
         await res.json(posts)
     } catch (error) {
@@ -70,10 +84,16 @@ router.post('/post/create', jsonParser, async (req, res) => {
 })
 
 // удаление
-router.delete('/post/delete/:id', async (req, res) => {
+router.get('/post/delete/:id', async (req, res) => {
     const {id} = req.params;
+    console.log('detele', id);
     try {
-        await Post.deleteOne({_id: id})
+        await Post.deleteOne({postId: {$regex: new RegExp(`^${id}$`, 'i')}})
+            .then(function(){
+                console.log("Post deleted"); // Success
+            }).catch(function(error){
+                console.log(error); // Failure
+            });
 
         res.status(200)
         res.json({
@@ -94,15 +114,15 @@ router.post('/post/update/:id', async (req, res) => {
             userAvatar: data.userAvatar,
             userId: data.userId,
             published: data.published,
+            publishedDate: data.publishedDate,
             postId: data.postId,
             data: data.data,
             stared: data.stared,
             tags: data.tags,
-            images: [],
             hashtags: data.hashtags,
-            likes: [],
-            comments: [],
-            viewsCount: 0,
+            likes: data.likes,
+            comments: data.comments,
+            viewsCount: data.viewsCount,
           })
         if (!post) {
             const article = new Post({
@@ -110,11 +130,11 @@ router.post('/post/update/:id', async (req, res) => {
                 userAvatar: data.userAvatar,
                 userId: data.userId,
                 published: data.published,
+                publishedDate: data.publishedDate,
                 postId: data.postId,
                 data: data.data,
                 stared: data.stared,
                 tags: data.tags,
-                images: [],
                 hashtags: data.hashtags,
                 likes: [],
                 comments: [],

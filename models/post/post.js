@@ -6,6 +6,7 @@ const postSchema = new Schema({
     userAvatar: String,
     userId: String,
     published: Boolean,
+    publishedDate: String,
     postId: String,
     data: [],
     stared: [],
@@ -14,7 +15,6 @@ const postSchema = new Schema({
         title: String,
         color: String,
     }],
-    images: [String],
     hashtags: [String],
     likes: [{
         username: String,
