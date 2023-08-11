@@ -41,11 +41,7 @@ async function start(PORT, UrlDB) {
     try {
         console.log('Если не запускается проект, то скорее всего не включен VPN' + UrlDB)
         await mongoose
-        .connect(UrlDB, {
-          useNewUrlParser: true,
-          useCreateIndex: true,
-          useUnifiedTopology: true
-        })
+        .connect(UrlDB)
         .catch(err => {
           console.log(Error, err.message);
         })
