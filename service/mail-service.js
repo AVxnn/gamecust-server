@@ -1,6 +1,6 @@
 import nodemailer from 'nodemailer';
 
-export default function SendEmail(to, link) {
+export default async function SendEmail(to, link) {
     let message = {
         from: process.env.SMTP_USER,
         to,
@@ -31,8 +31,11 @@ export default function SendEmail(to, link) {
         requireTLS: true,
         logger: true
     });
-    transporter.sendMail(message, (err, info) => {
-        if (err) return console.log(err);
-        console.log('email sent: ' + info)
-    });
+    await new Promise((resolve, reject) => {
+        transporter.sendMail(message, (err, info) => {
+            if (err) return console.log(err);
+            console.log('email sent: ' + info)
+        });
+      });
+    
 }
