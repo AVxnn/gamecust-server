@@ -15,13 +15,13 @@ const app = express();
 
 app.use(cors({
     credentials: true,
-    origin: process.env.CLIENT_URL,
+    origin: true,
 }));
 app.use(express.json());
 app.use(fileUpload({}));
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }))
-
+axios.defaults.withCredentials = true
 app.use(express.static(process.env.STATIC_PATH))
 
 
