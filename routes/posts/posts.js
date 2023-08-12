@@ -108,6 +108,7 @@ router.get('/post/delete/:id', async (req, res) => {
 // редактирование
 router.post('/post/update/:id', async (req, res) => {
     const {data} = req.body
+    console.log('work', data);
     try {
         const post = await Post.findOneAndUpdate({postId: data.postId}, {
             username: data.username,
