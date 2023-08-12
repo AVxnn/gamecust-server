@@ -20,13 +20,11 @@ const corsConfig = {
   
 app.use(cors(corsConfig));
 app.options('*', cors(corsConfig))
-
 app.use(express.json());
 app.use(fileUpload({}));
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }))
-
-app.use(express.static(process.env.STATIC_PATH))
+app.use("/img", express.static("static"))
 
 
 app.use('/api', auth)
