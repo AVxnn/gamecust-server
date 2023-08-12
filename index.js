@@ -15,21 +15,13 @@ const app = express();
 
 app.use(cors({
     credentials: true,
-    origin: true,
+    origin: process.env.CLIENT_URL,
 }));
 app.use(express.json());
 app.use(fileUpload({}));
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }))
 
-app.use(function(req, res, next) {
-    res.header('Access-Control-Allow-Origin', yourExactHostname);
-    res.header('Access-Control-Allow-Credentials', true);
-    res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
-    next();
-});
-
-axios.defaults.withCredentials = true
 app.use(express.static(process.env.STATIC_PATH))
 
 
@@ -47,13 +39,8 @@ app.use(error)
 
 async function start(PORT, UrlDB) {
     try {
-        console.log('Если не запускается проект, то скорее всего не включен VPN' + UrlDB)
-        await mongoose
-        .connect(UrlDB)
-        .catch(err => {
-          console.log(Error, err.message);
-        })
-        .then(() => console.log("DB Connected!"))
+        console.log('Если не запускается проект, то скорее всего не включен VPN')
+        await mongoose.connect(UrlDB);
         app.listen(PORT, () => console.log('server start Port', PORT));
     } catch (e) {
         console.log(e)
