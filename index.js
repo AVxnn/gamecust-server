@@ -13,10 +13,14 @@ import error from './middleware/error/error.js'
 
 const app = express();
 
-app.use(cors({
+const corsConfig = {
+    origin: true,
     credentials: true,
-    origin: process.env.CLIENT_URL,
-}));
+};
+  
+app.use(cors(corsConfig));
+app.options('*', cors(corsConfig))
+
 app.use(express.json());
 app.use(fileUpload({}));
 app.use(cookieParser());
