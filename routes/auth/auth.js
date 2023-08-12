@@ -18,7 +18,7 @@ router.post('/user/registration',
 router.post('/user/login', UserController.login)
 router.post('/user/logout', UserController.logout)
 router.get('/user/activate/:link', UserController.activate)
-router.post('/user/addSubscriptions', UserController.addSubscriptions)
+router.post('/user/addSubscriptions', authMiddleware, UserController.addSubscriptions)
 router.get('/user/refresh', UserController.refresh)
 router.get('/user/getUsers', authMiddleware, UserController.getUsers)
 router.get('/user/getUser/:id', UserController.getUser)
