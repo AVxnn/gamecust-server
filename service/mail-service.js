@@ -28,8 +28,7 @@ export default async function SendEmail(to, link) {
                     <h3>По всем вопросам обращайтесь в телеграм <a href="https://t.me/romashkog">@romashkog</a></h3>
                 <div/>
             <div/>
-            `, alternative: true },
-            { path: 'path/to/file.zip', type: 'application/zip', name: 'renamed.zip' },
+            `, alternative: true }
         ],
     };
 
