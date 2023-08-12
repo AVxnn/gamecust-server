@@ -25,7 +25,7 @@ app.use(fileUpload({}));
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }))
 
-app.use(`${process.env.STATIC_PATH}/static`, express.static('static'))
+app.use(express.static(process.env.STATIC_PATH))
 
 
 app.use('/api', auth)
