@@ -22,7 +22,7 @@ app.use(fileUpload({}));
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }))
 
-app.use(express.static(process.env.STATIC_PATH))
+app.use(express.static(__dirname + 'static'))
 
 
 app.use('/api', auth)
