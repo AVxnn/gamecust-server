@@ -29,7 +29,7 @@ router.get('/post/getPosts/filter/:filterParams', async (req, res) => {
     const {filterParams} = req.params
     console.log(filterParams);
     try {
-        const post = await Post.find({userId: {$regex: new RegExp(`^${filterParams}$`, 'i')}}).sort({publishedDate: -1});
+        const post = await Post.find({userId: {$regex: new RegExp(`^${filterParams}$`, 'i')}}).sort({publishedDate: "desc"});
         console.log(post);
 
         await res.json(post)
@@ -42,7 +42,7 @@ router.get('/post/getPosts/filter/:filterParams', async (req, res) => {
 // просмотр всех постов
 router.get('/post/getPosts', async (req, res) => {
     try {
-        const posts = await Post.find({ published: true}).sort({publishedDate: -1})
+        const posts = await Post.find({ published: true}).sort({publishedDate: "desc"})
 
         await res.json(posts)
     } catch (error) {
