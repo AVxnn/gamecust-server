@@ -25,7 +25,7 @@ app.use(fileUpload({}));
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }))
 
-app.use('/api/static', express.static("static"))
+app.use(express.static("static"))
 
 
 app.use('/api', auth)
