@@ -7,7 +7,8 @@ const userSchema = new Schema({
         required: true
     },
     level: {
-        type: Number
+        type: Number,
+        default: 0
     },
     email: {
         type: String,
@@ -27,6 +28,18 @@ const userSchema = new Schema({
     },
     description: {
         type: String,
+        default: 'Это сообщение можно изменить в настройках профиля'
+    },
+    private: {
+        type: String,
+        default: 'all'
+    },
+    avatarPath: {
+        type: String,
+    },
+    roles: {
+        type: Array,
+        default: ['user']
     },
     subscribers: {
         type: Array,

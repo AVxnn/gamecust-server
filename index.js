@@ -25,8 +25,8 @@ app.use(fileUpload({}));
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }))
 
-app.use('/images', express.static("static"))
 app.use('', express.static("static"))
+app.use('', express.static("avatars"))
 
 app.use('/api', auth)
 app.use('/api', posts)

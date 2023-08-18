@@ -64,6 +64,17 @@ class UserController {
         }
     }
 
+    async reSaveData(req, res, next) {
+        try {
+            const {data} = req.body;
+            console.log(data);
+            const userData = await userService.reSaveData(data);
+            return res.json(userData);
+        } catch (error) {
+            next(error);
+        }
+    }
+
     async refresh(req, res, next) {
         try {
             const {refreshToken} = req.cookies;

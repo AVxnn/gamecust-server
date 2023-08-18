@@ -11,6 +11,7 @@ const jsonParser = bodyParser.json()
 const router = express.Router()
 
 router.post('/file/upload', FileController.uploadImage)
+router.post('/file/uploadAvatar', FileController.uploadAvatar)
 // router.post('/user/delete', FileController.logout)
 
 export default router;

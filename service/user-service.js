@@ -36,16 +36,6 @@ class UserService {
 
     }
 
-    async addSubscribers(id, data) {
-        const user = await User.findOne({activationLink})
-        if(!user) {
-            throw ApiError.BadRequest(`Неккоректная ссылка активации`)
-        }
-        user.isActivated = true;
-        await user.save()
-
-    }
-
     async addSubscriptions(id, uId) {
         let user = await User.findOne({_id: id})
         let uIduser = await User.findOne({_id: uId})
@@ -117,6 +107,20 @@ class UserService {
     async getUserId(id) {
         const user = await User.findOne({_id: id});
         console.log('idw', user);
+        return user;
+    }
+
+    async reSaveData(data) {
+        let user = await User.findOne({_id: data.id})
+        if(!user) {
+            throw ApiError.BadRequest(`Неккоректный аккаунт id`)
+        }
+        user.description = data.description || user.description;
+        user.username = data.username || user.username;
+        user.private = data.private || user.description;
+        user.avatarPath = data.avatarPath || user.avatarPath;
+        console.log(user);
+        await user.save()
         return user;
     }
 }

@@ -4,14 +4,20 @@ export default class UserDto {
     isActivation;
     level;
     username;
+    private;
+    description;
+    avatarPath;
 
     constructor(model) {
         this.username = model.username
         this.email = model.email;
+        this.description = model.description
         this.id = model._id;
         this.isActivated = model.isActivated;
         this.level = model.rating;
         this.subscribers = model.subscribers;
         this.subscriptions = model.subscriptions;
+        this.private = model.private;
+        this.avatarPath = model.avatarPath;
     }
 }
