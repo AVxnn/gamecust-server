@@ -59,6 +59,8 @@ class UserService {
         console.log(user.subscribers, uIduser.subscriptions);
         await user.save()
         await uIduser.save()
+        const userDto = new UserDto(uIduser);
+        return { user: userDto };
     }
 
     async login(email, password) {

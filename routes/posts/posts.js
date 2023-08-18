@@ -25,11 +25,11 @@ router.get('/post/getPost/:id', async (req, res) => {
     }
 })
 
-router.get('/post/getPosts/filter/:filterParams', async (req, res) => {
-    const {filterParams} = req.params
-    console.log(filterParams);
+router.get('/post/getPosts/filter/:filterParams/:page', async (req, res) => {
+    const {filterParams, page} = req.params
+    let pageRes = page || 1
     try {
-        const post = await Post.find({userId: {$regex: new RegExp(`^${filterParams}$`, 'i')}}).sort({publishedDate: "desc"});
+        const post = await Post.find({userId: {$regex: new RegExp(`^${filterParams}$`, 'i')}}).limit(pageRes * 10).sort({publishedDate: "desc"});
         console.log(post);
 
         await res.json(post)
@@ -39,10 +39,25 @@ router.get('/post/getPosts/filter/:filterParams', async (req, res) => {
     }
 })
 
-// просмотр всех постов
-router.get('/post/getPosts', async (req, res) => {
+router.get('/post/getPosts/rec/:page', async (req, res) => {
+    let { page } = req.params;
+    let pageRes = page || 1
     try {
-        const posts = await Post.find({ published: true}).sort({publishedDate: "desc"})
+        const post = await Post.find({ published: true}).limit(pageRes * 10).sort({viewsCount: -1});
+        console.log(post);
+        await res.json(post)
+    } catch (error) {
+        res.status(404)
+        res.json(`Такой идентификатор не найден попробуйте другой`)
+    }
+})
+
+// просмотр всех постов
+router.get('/post/getPosts/:page', async (req, res) => {
+    const {page} = req.params
+    let pageRes = page || 1
+    try {
+        const posts = await Post.find({ published: true}).limit(pageRes * 10).sort({publishedDate: "desc"});
 
         await res.json(posts)
     } catch (error) {
