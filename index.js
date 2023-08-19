@@ -7,6 +7,8 @@ import fileUpload from 'express-fileupload';
 import dotenv from 'dotenv';
 import cookieParser from 'cookie-parser';
 import cors from 'cors'
+import schedule from "node-schedule";
+import Post from './models/post/post.js';
 dotenv.config();
 
 import error from './middleware/error/error.js'
@@ -49,6 +51,55 @@ async function start(PORT, UrlDB) {
         console.log(e)
     }
 }
+
+// Регулярное обновление "Поста дня" (каждый день в полночь)
+const postDay = schedule.scheduleJob('* * * *', async function () {
+    const posts = await Post.find({ published: true}).sort({viewsCount: -1});
+    posts.map( async (post, index) => {
+        if (post.viewsCount && index == 0) {
+            console.log(await index);
+            let data = await Post.findOneAndUpdate({postId: post.postId}, {
+                username: post.username,
+                userAvatar: post.userAvatar,
+                userId: post.userId,
+                published: post.published,
+                publishedDate: post.publishedDate,
+                postId: post.postId,
+                data: post.data,
+                stared: post.stared,
+                tags: [{
+                    icon: 'fire',
+                    type: 'postday',
+                    title: 'Пост дня',
+                    color: "#F05353",
+                }], 
+                hashtags: post.hashtags,
+                likes: post.likes,
+                comments: post.comments,
+                viewsCount: post.viewsCount,    
+            })
+            console.log(data);
+        } else {
+            let data = await Post.findOneAndUpdate({postId: post.postId}, {
+                username: post.username,
+                userAvatar: post.userAvatar,
+                userId: post.userId,
+                published: post.published,
+                publishedDate: post.publishedDate,
+                postId: post.postId,
+                data: post.data,
+                tags: [],
+                stared: post.stared,
+                hashtags: post.hashtags,
+                likes: post.likes,
+                comments: post.comments,
+                viewsCount: post.viewsCount,   
+            })
+            console.log(data);
+        }
+    })
+    console.log('Задача выполнилась в ' + new Date());
+});
 
 const UrlDB = process.env.UrlDB
 const PORT = process.env.PORT || 4000;

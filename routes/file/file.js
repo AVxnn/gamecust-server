@@ -12,6 +12,6 @@ const router = express.Router()
 
 router.post('/file/upload', FileController.uploadImage)
 router.post('/file/uploadAvatar', FileController.uploadAvatar)
-// router.post('/user/delete', FileController.logout)
+router.post('/file/deleteAvatar', FileController.deleteAvatar)
 
 export default router;

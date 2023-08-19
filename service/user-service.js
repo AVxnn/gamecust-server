@@ -117,11 +117,11 @@ class UserService {
         }
         user.description = data.description || user.description;
         user.username = data.username || user.username;
-        user.private = data.private || user.description;
+        user.private = data.private || user.private;
         user.avatarPath = data.avatarPath || user.avatarPath;
         console.log(user);
         await user.save()
-        return user;
+        return {user: user};
     }
 }
 

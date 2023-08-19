@@ -10,11 +10,7 @@ const postSchema = new Schema({
     postId: String,
     data: [],
     stared: [],
-    tags: [{
-        icon: String,
-        title: String,
-        color: String,
-    }],
+    tags: [],
     hashtags: [String],
     likes: [{
         username: String,

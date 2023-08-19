@@ -1,10 +1,8 @@
-import userService from "../service/user-service.js";
-import {validationResult} from 'express-validator'
 import ApiError from "../exceptions/api-error.js";
 import path from 'path';
 import { fileURLToPath } from 'url';
 import {v4} from 'uuid'
-import Post from '../models/post/post.js';
+import * as fs from 'fs';
 
 class FileController {
 
@@ -37,6 +35,19 @@ class FileController {
                 image.mv(path.resolve(__dirname, '..', 'avatars', fileName))
             }
             return res.json(fileName, image, id);
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    async deleteAvatar(req, res, next) {
+        try {
+            const {pathUrl} = req.body;
+            console.log(pathUrl);
+            const __filename = fileURLToPath(import.meta.url);
+            const __dirname = path.dirname(__filename);
+            fs.unlinkSync(path.resolve(__dirname, '..', 'avatars', pathUrl))
+            return res.json('image deleted');
         } catch (error) {
             next(error);
         }

@@ -43,7 +43,7 @@ router.get('/post/getPosts/rec/:page', async (req, res) => {
     let { page } = req.params;
     let pageRes = page || 1
     try {
-        const post = await Post.find({ published: true}).limit(pageRes * 10).sort({viewsCount: -1});
+        const post = await Post.find({ published: true}).limit(pageRes * 10).sort({viewsCount: 1, publishedDate: -1});
         console.log(post);
         await res.json(post)
     } catch (error) {
