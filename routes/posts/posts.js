@@ -26,10 +26,10 @@ router.get('/post/getPost/:id', async (req, res) => {
 
 router.get('/post/getPosts/filter/:filterParams/:page', async (req, res) => {
     const {filterParams, page} = req.params
-    let pageRes = page || 1
+    const limit = 10
+    const skip = page * limit;
     try {
-        const post = await Post.find({userId: {$regex: new RegExp(`^${filterParams}$`, 'i')}}).limit(pageRes * 10).sort({publishedDate: "desc"});
-        console.log(post);
+        const post = await Post.find({userId: {$regex: new RegExp(`^${filterParams}$`, 'i')}}).skip(skip).limit(limit).sort({publishedDate: "desc"});
         await res.json(post)
     } catch (error) {
         res.status(404)
@@ -43,7 +43,6 @@ router.get('/post/getPosts/rec/:page', async (req, res) => {
     const skip = page * limit;
     try {
         const post = await Post.find({ published: true}).skip(skip).limit(limit).sort({viewsCount: -1, publishedDate: -1});
-        console.log(post);
         await res.json(post)
     } catch (error) {
         res.status(404)
@@ -53,11 +52,12 @@ router.get('/post/getPosts/rec/:page', async (req, res) => {
 
 // просмотр всех постов
 router.get('/post/getPosts/:page', async (req, res) => {
-    const {page} = req.params
-    let pageRes = page || 1
+    const { page } = req.params
+    const limit = 10
+    const skip = page * limit;
     try {
-        const posts = await Post.find({ published: true}).limit(pageRes * 10).sort({publishedDate: "desc"});
-
+        const posts = await Post.find({ published: true }).skip(skip).limit(limit).sort({publishedDate: "desc"});
+        
         await res.json(posts)
     } catch (error) {
         res.status(400)

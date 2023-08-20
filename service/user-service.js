@@ -3,6 +3,7 @@ import bcrypt from 'bcrypt'
 import {v4} from 'uuid'
 import SendEmail from './mail-service.js';
 import tokenService from './token-service.js';
+import Post from '../models/post/post.js';
 import UserDto from '../dtos/user-dto.js';
 import ApiError from '../exceptions/api-error.js';
 
@@ -117,7 +118,13 @@ class UserService {
         user.username = data.username || user.username;
         user.private = data.private || user.private;
         user.avatarPath = data.avatarPath || user.avatarPath;
-        console.log(user);
+        const posts = await Post.find({userId: {$regex: new RegExp(`^${data.id}$`, 'i')}}).sort({publishedDate: "desc"});
+        for (const post of posts) {
+            await Post.findOneAndUpdate({postId: post.postId}, {
+                username: data.username,
+                userAvatar: data.avatarPath,
+            })
+        }
         await user.save()
         return {user: user};
     }
