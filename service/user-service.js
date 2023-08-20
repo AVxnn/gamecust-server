@@ -15,7 +15,7 @@ class UserService {
         const hashPassword = await bcrypt.hash(password, 5)
         const activationLink = v4()
         const rating = 0
-        console.log(username);
+        
         const user = await User.create({username, rating, email, password: hashPassword, activationLink})
         await SendEmail(email, `${process.env.API_URL}/api/user/activate/${activationLink}`);
 
@@ -46,7 +46,7 @@ class UserService {
             user.subscribers.push(uId);
             uIduser.subscriptions.push(id);
         }
-        console.log(user.subscribers, uIduser.subscriptions);
+
         await user.save()
         await uIduser.save()
         const userDto = new UserDto(uIduser);
@@ -100,13 +100,11 @@ class UserService {
 
     async getUser(username) {
         const user = await User.findOne({username: {$regex: new RegExp(`^${username}$`, 'i')}});
-        console.log(user);
         return user;
     }
 
     async getUserId(id) {
         const user = await User.findOne({_id: id});
-        console.log('idw', user);
         return user;
     }
 

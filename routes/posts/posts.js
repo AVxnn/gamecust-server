@@ -17,7 +17,6 @@ router.get('/post/getPost/:id', async (req, res) => {
     try {
         const post = await Post.findOne({postId: {$regex: new RegExp(`^${id}$`, 'i')}});
         console.log(post);
-
         await res.json(post)
     } catch (error) {
         res.status(404)
@@ -31,7 +30,6 @@ router.get('/post/getPosts/filter/:filterParams/:page', async (req, res) => {
     try {
         const post = await Post.find({userId: {$regex: new RegExp(`^${filterParams}$`, 'i')}}).limit(pageRes * 10).sort({publishedDate: "desc"});
         console.log(post);
-
         await res.json(post)
     } catch (error) {
         res.status(404)
@@ -41,9 +39,10 @@ router.get('/post/getPosts/filter/:filterParams/:page', async (req, res) => {
 
 router.get('/post/getPosts/rec/:page', async (req, res) => {
     let { page } = req.params;
-    let pageRes = page || 1
+    const limit = 10
+    const skip = page * limit;
     try {
-        const post = await Post.find({ published: true}).limit(pageRes * 10).sort({viewsCount: 1, publishedDate: -1});
+        const post = await Post.find({ published: true}).skip(skip).limit(limit).sort({viewsCount: -1, publishedDate: -1});
         console.log(post);
         await res.json(post)
     } catch (error) {
