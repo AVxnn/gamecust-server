@@ -6,6 +6,10 @@ export default class UserDto {
     username;
     private;
     description;
+    subscribers;
+    iconActive;
+    icons;
+    subscriptions;
     avatarPath;
 
     constructor(model) {
@@ -18,6 +22,8 @@ export default class UserDto {
         this.subscribers = model.subscribers;
         this.subscriptions = model.subscriptions;
         this.private = model.private;
+        this.iconActive = model.iconActive;
+        this.icons = model.icons;
         this.avatarPath = model.avatarPath;
     }
 }

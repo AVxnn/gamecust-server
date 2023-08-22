@@ -20,6 +20,23 @@ class UserController {
         }
     }
 
+    async registrationGoogle(req, res, next) {
+        try {
+            console.log(req.body);
+            const errors = validationResult(req);
+            if(!errors.isEmpty()) {
+                return next(ApiError.BadRequest('Ошибка при валидации', errors.array()));
+            }
+            const {username, email, picture, sub, email_verified} = req.body;
+            const userData = await userService.registrationGoogle(username, email, picture, sub, email_verified);
+
+            res.cookie('refreshToken', userData.refreshToken, {maxAge: 30 * 24 * 60 * 60 * 1000, httpOnly: true, secure: true, sameSite: "none" });
+            return res.json(userData);
+        } catch (error) {
+            next(error);
+        }
+    }
+
     async login(req, res, next) {
         try {
             const {email, password} = req.body;

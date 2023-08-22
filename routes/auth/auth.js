@@ -15,6 +15,7 @@ router.post('/user/registration',
     body('email').isEmail(),
     body('password').isLength({min: 3, max: 32}),
     UserController.registration)
+router.post('/user/registration/Google',UserController.registrationGoogle)
 router.post('/user/login', UserController.login)
 router.post('/user/logout', UserController.logout)
 router.get('/user/activate/:link', UserController.activate)

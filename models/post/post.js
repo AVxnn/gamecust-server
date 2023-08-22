@@ -8,10 +8,19 @@ const postSchema = new Schema({
     published: Boolean,
     publishedDate: String,
     postId: String,
+    iconActive: String,
     data: [],
     stared: [],
-    tags: [],
-    hashtags: [String],
+    tags: [{
+        type: String,
+        text: String,
+        color: String,
+    }],
+    hashtags: [{
+        id: String,
+        text: String,
+        color: String,
+    }],
     likes: [{
         username: String,
         createAt: String

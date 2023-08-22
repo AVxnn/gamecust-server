@@ -27,6 +27,34 @@ class UserService {
         return {...tokens, user: userDto}
     }
 
+    async registrationGoogle(username, email, picture, sub, email_verified) {
+        const candidate = await User.findOne({email});
+        console.log('w', email, username, picture);
+        const hashPassword = await bcrypt.hash(sub, 5)
+        if(candidate) {
+            const isPassEquals = await bcrypt.compare(hashPassword, candidate.password);
+            console.log('yes', isPassEquals);
+
+            const userDto = new UserDto(candidate);
+            const tokens = tokenService.generateTokens({...userDto});
+
+            await tokenService.saveToken(userDto.id, tokens.refreshToken); 
+
+            return {...tokens, user: userDto}
+        }
+        const activationLink = v4()
+        const rating = 0
+        
+        const user = await User.create({username, rating, email, avatarPath: picture, password: hashPassword, isActivated: email_verified})
+        // await SendEmail(email, `${process.env.API_URL}/api/user/activate/${activationLink}`);
+
+        const userDto = new UserDto(user); // id email isActivated
+        const tokens = tokenService.generateTokens({...userDto});
+        await tokenService.saveToken(userDto.id, tokens.refreshToken); 
+
+        return {...tokens, user: userDto}
+    }
+    
     async activate(activationLink) {
         const user = await User.findOne({activationLink})
         if(!user) {
@@ -57,11 +85,11 @@ class UserService {
     async login(email, password) {
         const user = await User.findOne({email});
         if(!user) {
-            throw ApiError.BadRequest(`Пользователь с таким Email не найден`);
+            return ApiError.BadRequest(`Пользователь с таким Email не найден`, `Пользователь с таким Email не найден`);
         }
         const isPassEquals = await bcrypt.compare(password, user.password);
         if(!isPassEquals) {
-            throw ApiError.BadRequest(`Неверный пароль`);
+            return ApiError.BadRequest(`Неверный пароль`, `Неверный пароль`);
         }
         const userDto = new UserDto(user);
         const tokens = tokenService.generateTokens({...userDto});
@@ -116,13 +144,15 @@ class UserService {
         }
         user.description = data.description || user.description;
         user.username = data.username || user.username;
+        user.iconActive = data.iconActive || user.iconActive;
         user.private = data.private || user.private;
         user.avatarPath = data.avatarPath || user.avatarPath;
         const posts = await Post.find({userId: {$regex: new RegExp(`^${data.id}$`, 'i')}}).sort({publishedDate: "desc"});
         for (const post of posts) {
             await Post.findOneAndUpdate({postId: post.postId}, {
-                username: data.username,
-                userAvatar: data.avatarPath,
+                username: data.username || user.username,
+                userAvatar: data.avatarPath || user.avatarPath,
+                iconActive: data.iconActive || user.iconActive,
             })
         }
         await user.save()

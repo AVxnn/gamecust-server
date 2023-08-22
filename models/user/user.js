@@ -37,6 +37,13 @@ const userSchema = new Schema({
     avatarPath: {
         type: String,
     },
+    iconActive: {
+        type: String,
+        default: ''
+    },
+    icons: {
+        type: Array
+    },
     roles: {
         type: Array,
         default: ['user']

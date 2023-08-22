@@ -33,14 +33,13 @@ app.use('', express.static("avatars"))
 app.use('/api', auth)
 app.use('/api', posts)
 app.use('/api', file)
+app.use(error)
 
 app.get('/', async (req, res) => {
     res.json({
         title: 'hello!'
     })
 })
-
-app.use(error)
 
 async function start(PORT, UrlDB) {
     try {
@@ -53,7 +52,7 @@ async function start(PORT, UrlDB) {
 }
 
 // Регулярное обновление "Поста дня" (каждый день в полночь)
-const postDay = schedule.scheduleJob('* * * *', async function () {
+const postDay = schedule.scheduleJob('30 * * * *', async function () {
     const posts = await Post.find({ published: true}).sort({viewsCount: -1});
     posts.map( async (post, index) => {
         if (post.viewsCount && index == 0) {
@@ -68,9 +67,8 @@ const postDay = schedule.scheduleJob('* * * *', async function () {
                 data: post.data,
                 stared: post.stared,
                 tags: [{
-                    icon: 'fire',
                     type: 'postday',
-                    title: 'Пост дня',
+                    text: 'Пост дня',
                     color: "#F05353",
                 }], 
                 hashtags: post.hashtags,
