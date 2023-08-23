@@ -84,6 +84,7 @@ router.post('/post/create', jsonParser, async (req, res) => {
             hashtags: data.hashtags,
             likes: [],
             comments: [],
+            views: [],
             viewsCount: 0,
         })
     
@@ -139,6 +140,7 @@ router.post('/post/update/:id', async (req, res) => {
             hashtags: data.hashtags,
             likes: data.likes,
             comments: data.comments,
+            views: data.views,
             viewsCount: data.viewsCount,
           })
         if (!post) {
@@ -156,6 +158,7 @@ router.post('/post/update/:id', async (req, res) => {
                 hashtags: data.hashtags,
                 likes: [],
                 comments: [],
+                views: [],
                 viewsCount: 0,
             })
             await article.save()
