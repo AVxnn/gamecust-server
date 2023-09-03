@@ -2,6 +2,7 @@ import express from 'express';
 import mongoose from 'mongoose';
 import posts from './routes/posts/posts.js';
 import file from './routes/file/file.js';
+import comments from './routes/comments/comments.js';
 import auth from './routes/auth/auth.js';
 import fileUpload from 'express-fileupload';
 import dotenv from 'dotenv';
@@ -32,7 +33,8 @@ app.use('', express.static("avatars"))
 
 app.use('/api', auth)
 app.use('/api', posts)
-app.use('/api', file)
+app.use('/api', file) 
+app.use('/api', comments)
 app.use(error)
 
 app.get('/', async (req, res) => {

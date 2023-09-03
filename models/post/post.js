@@ -13,18 +13,12 @@ const postSchema = new Schema({
     stared: [],
     tags: [],
     hashtags: [{
-        id: String,
+        type: String,
         text: String,
         color: String,
     }],
     likes: [],
-    comments: [{
-        username: String,
-        userAvatar: String,
-        createAt: String,
-        content: String,
-        likes: [String]
-    }],
+    comments: [String],
     views: [String],
     viewsCount: Number,
 });
