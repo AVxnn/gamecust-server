@@ -18,9 +18,9 @@ class FileController {
                 image.mv(path.resolve(__dirname, '..', 'static', fileName))
             }
             if (process.env.PRODACTION) {
-                return res.json(`${process.env.API_URL}/avatars/${fileName}`, image, id);
+                return res.json(`${process.env.API_URL}/static/${fileName}`, image, id);
             } else {
-                return res.json(`${process.env.API_URL}/${fileName}`, image, id);
+                return res.json(`${process.env.API_URL}/static/${fileName}`, image, id);
             }
         } catch (error) {
             next(error);
@@ -38,7 +38,7 @@ class FileController {
                 fileName = v4() + '.' + image.name.match(/(png|jpg|jpeg|gif)/mg)[0];
                 image.mv(path.resolve(__dirname, '..', 'avatars', fileName))
             }
-            return res.json(`${process.env.IMAGE_URL}/${fileName}`, image, id);
+            return res.json(`${process.env.IMAGE_URL}/avatars/${fileName}`, image, id);
         } catch (error) {
             next(error);
         }
