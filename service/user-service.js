@@ -4,6 +4,7 @@ import {v4} from 'uuid'
 import SendEmail from './mail-service.js';
 import tokenService from './token-service.js';
 import Post from '../models/post/post.js';
+import Comment from '../models/comment/comment.js';
 import UserDto from '../dtos/user-dto.js';
 import ApiError from '../exceptions/api-error.js';
 
@@ -152,6 +153,14 @@ class UserService {
             await Post.findOneAndUpdate({postId: post.postId}, {
                 username: data.username || user.username,
                 userAvatar: data.avatarPath || user.avatarPath,
+                iconActive: data.iconActive || user.iconActive,
+            })
+        }
+        const Comments = await Comment.find({userId: {$regex: new RegExp(`^${data.id}$`, 'i')}});
+        for (const comment of Comments) {
+            await Comment.findOneAndUpdate({_id: comment._id}, {
+                author: data.username || user.username,
+                AvatarPath: data.avatarPath || user.avatarPath,
                 iconActive: data.iconActive || user.iconActive,
             })
         }
