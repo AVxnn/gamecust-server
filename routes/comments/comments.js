@@ -62,6 +62,7 @@ router.post('/comment/create', jsonParser, async (req, res) => {
             userId: data.userId,
             postId: data.postId,
             repliesId: data.repliesId,
+            commentId: data.commentId,
             createdAt: `${Date.now()}`,
             likes: [],
             replies: []
@@ -70,6 +71,35 @@ router.post('/comment/create', jsonParser, async (req, res) => {
         await article.save()
         res.json({
             title: 'Комментарий создан',
+            infoTitle: article
+        })
+    } catch (error) {
+        res.status(400)
+        res.json(`Error`)
+    }
+})
+
+// ответ
+router.post('/comment/reply', jsonParser, async (req, res) => {
+    const {data} = req.body
+    console.log('comment', data);
+    try {
+        const article = new Comment({
+            text: data.text,
+            author: data.author,
+            AvatarPath: data.avatarPath,
+            userId: data.userId,
+            postId: data.postId,
+            repliesId: data.repliesId,
+            commentId: data.commentId,
+            createdAt: `${Date.now()}`,
+            likes: [],
+            replies: []
+        })
+    
+        await article.save()
+        res.json({
+            title: 'Комментарий отвечен',
             infoTitle: article
         })
     } catch (error) {
@@ -111,6 +141,7 @@ router.post('/comment/update/:id', async (req, res) => {
             AvatarPath: data.avatarPath,
             userId: data.userId,
             createdAt: data.createdAt,
+            commentId: data.commentId,
             likes: [],
             replies: []
           })
@@ -121,6 +152,7 @@ router.post('/comment/update/:id', async (req, res) => {
                 AvatarPath: data.avatarPath,
                 userId: data.userId,
                 createdAt: data.createdAt,
+                commentId: data.commentId,
                 likes: [],
                 replies: []
             })
