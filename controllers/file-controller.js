@@ -27,6 +27,21 @@ class FileController {
         }
     }
 
+    async deleteImage(req, res, next) {
+        try {
+            const {pathUrl} = req.body;
+            if (pathUrl) {
+                const __filename = fileURLToPath(import.meta.url);
+                const __dirname = path.dirname(__filename);
+                fs.unlinkSync(path.resolve(__dirname, '..', 'static', pathUrl))
+                return res.json('image deleted');
+            }
+            return res.json('not work');
+        } catch (error) {
+            next(error);
+        }
+    }
+
     async uploadAvatar(req, res, next) {
         try {
             const {id} = req.body;
@@ -47,11 +62,13 @@ class FileController {
     async deleteAvatar(req, res, next) {
         try {
             const {pathUrl} = req.body;
-            console.log(pathUrl);
-            const __filename = fileURLToPath(import.meta.url);
-            const __dirname = path.dirname(__filename);
-            fs.unlinkSync(path.resolve(__dirname, '..', 'avatars', pathUrl))
-            return res.json('image deleted');
+            if (pathUrl) {
+                const __filename = fileURLToPath(import.meta.url);
+                const __dirname = path.dirname(__filename);
+                fs.unlinkSync(path.resolve(__dirname, '..', 'avatars', pathUrl))
+                return res.json('image deleted');
+            }
+            return res.json('not work');
         } catch (error) {
             next(error);
         }
