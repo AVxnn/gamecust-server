@@ -10,7 +10,6 @@ const tokenSchema = new Schema({
         type: String,
         required: true
     },
-     
 });
 
 const User = model('Token', tokenSchema);

@@ -34,9 +34,9 @@ class UserService {
         const hashPassword = await bcrypt.hash(sub, 5)
         if(candidate) {
             const isPassEquals = await bcrypt.compare(hashPassword, candidate.password);
-            console.log('yes', isPassEquals);
-
+            console.log('yes', isPassEquals, hashPassword, candidate.password );
             const userDto = new UserDto(candidate);
+            console.log('www', userDto)
             const tokens = tokenService.generateTokens({...userDto});
 
             await tokenService.saveToken(userDto.id, tokens.refreshToken); 
@@ -46,8 +46,8 @@ class UserService {
         const activationLink = v4()
         const rating = 0
         
-        const user = await User.create({username, rating, email, avatarPath: picture, password: hashPassword, isActivated: email_verified})
-        // await SendEmail(email, `${process.env.API_URL}/api/user/activate/${activationLink}`);
+        const user = await User.create({username, rating, email, avatarPath: picture, password: hashPassword, activationLink: activationLink})
+        await SendEmail(email, `${process.env.API_URL}/api/user/activate/${activationLink}`);
 
         const userDto = new UserDto(user); // id email isActivated
         const tokens = tokenService.generateTokens({...userDto});

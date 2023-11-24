@@ -10,6 +10,10 @@ const userSchema = new Schema({
         type: Number,
         default: 0
     },
+    exp: {
+        type: Number,
+        default: 0
+    },
     email: {
         type: String,
         unique: true,
@@ -28,7 +32,7 @@ const userSchema = new Schema({
     },
     description: {
         type: String,
-        default: 'Это сообщение можно изменить в настройках профиля'
+        default: 'Измените в настройках'
     },
     private: {
         type: String,
