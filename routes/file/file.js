@@ -12,6 +12,8 @@ const router = express.Router()
 
 router.post('/file/upload', FileController.uploadImage)
 router.post('/file/deleteupload', FileController.deleteImage)
+router.post('/file/uploadComment', FileController.uploadComment)
+router.post('/file/deleteComment', FileController.deleteComment)
 router.post('/file/uploadAvatar', FileController.uploadAvatar)
 router.post('/file/deleteAvatar', FileController.deleteAvatar)
 

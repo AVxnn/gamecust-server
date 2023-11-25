@@ -31,6 +31,7 @@ app.use(express.urlencoded({ extended: true }))
 
 app.use('', express.static("static"))
 app.use('', express.static("avatars"))
+app.use('', express.static("comments"))
 
 app.use('/api', auth)
 app.use('/api', posts)

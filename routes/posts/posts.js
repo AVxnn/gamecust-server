@@ -78,6 +78,26 @@ router.get("/post/getPosts/:page", async (req, res) => {
   }
 });
 
+// Получить только опубликованные посты у пользователя
+router.get("/post/getPosts/:uid/:page", async (req, res) => {
+  const { uid, page } = req.params;
+  const limit = 10;
+  const skip = page * limit;
+  try {
+    const posts = await Post.find({
+      userId: uid,
+      published: true,
+    })
+      .skip(skip)
+      .limit(limit)
+      .sort({ publishedDate: "desc" });
+    await res.json(posts);
+  } catch (error) {
+    res.status(400);
+    res.json(`Error`);
+  }
+});
+
 // создание
 router.post("/post/create", jsonParser, async (req, res) => {
   const { data } = req.body;
@@ -188,6 +208,40 @@ router.post("/post/update/:id", async (req, res) => {
     res.status(200);
     res.json({
       title: "Пост обновлен",
+    });
+  } catch (error) {
+    res.status(400);
+    res.json(`Error`);
+  }
+});
+
+// add view counter
+router.get("/post/view/:id/:userId", async (req, res) => {
+  const { id, userId } = req.params;
+  console.log("view", id, userId);
+  try {
+    const postData = await Post.findOne({
+      postId: id,
+    });
+    if (postData.views.filter((id) => id === userId).length > 0) {
+      res.status(200);
+      res.json({
+        title: "Пост был просмотрен",
+      });
+      return true;
+    }
+    console.log(postData)
+    const post = await Post.findOneAndUpdate(
+      { postId: id },
+      {
+        views: [...postData.views, userId],
+        viewsCount: postData.viewsCount + 1,
+      }
+    );
+    console.log("put", post);
+    res.status(200);
+    res.json({
+      title: "Пост просмотрен",
     });
   } catch (error) {
     res.status(400);
