@@ -117,7 +117,9 @@ class UserController {
       const { data } = req.body;
       console.log(data);
       const userData = await userService.reSaveData(data);
-      return res.json(userData);
+      
+      console.log(res.json(await userData));
+      return res.json(await userData);
     } catch (error) {
       next(error);
     }
