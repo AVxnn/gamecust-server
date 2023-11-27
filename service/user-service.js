@@ -175,6 +175,22 @@ class UserService {
         console.log(res)
         return res;
     }
+
+
+
+    async addExp(data) {
+        const user = await User.findOne({_id: data.id})
+        user.exp = +user.exp + +data.value;
+        await user.save()
+        return {user: user};
+    }
+
+    async removeExp(data) {
+        const user = await User.findOne({_id: data.id})
+        user.exp = +user.exp - +data.value;
+        await user.save()
+        return {user: user};
+    }
 }
 
 export default new UserService

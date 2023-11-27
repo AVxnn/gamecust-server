@@ -26,4 +26,6 @@ router.get('/user/getUsers', authMiddleware, UserController.getUsers)
 router.get('/user/getUser/:id', UserController.getUser)
 router.get('/user/getUserId/:id', UserController.getUserId)
 router.get('/user/getTopUsers', UserController.getTopUsers)
+router.post('/user/addExpUser', UserController.addExpUser)
+router.post('/user/removeExpUser', UserController.removeExpUser)
 export default router;

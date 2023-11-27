@@ -180,6 +180,29 @@ class UserController {
       next(error);
     }
   }
+
+  async addExpUser(req, res, next) {
+    try {
+      const data = req.body;
+      console.log(data)
+      const user = await userService.addExp(data);
+      console.log(user);
+      return res.json(user);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async removeExpUser(req, res, next) {
+    try {
+      const data = req.body;
+      const user = await userService.removeExp(data);
+      console.log(user);
+      return res.json(user);
+    } catch (error) {
+      next(error);
+    }removeExp
+  }
 }
 
 export default new UserController();
