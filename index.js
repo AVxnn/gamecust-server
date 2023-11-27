@@ -57,23 +57,41 @@ async function start(PORT, UrlDB) {
 }
 
 const w = schedule.scheduleJob('30 * * * *', async function () {
-    let today = new Date().setHours(0, 0, 0, 0);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
     let posts = await Post.find({ published: true}).sort({viewsCount: -1});
-    let result = posts.filter(item => item.publishedDate >= today)[0]
+    const result = posts.filter((post) => {
+        // Получение даты публикации поста без времени
+        const postDate = new Date(+post.publishedDate);
+        postDate.setHours(0, 0, 0, 0);
+        console.log(postDate.getTime(), today.getTime())
+        return postDate.getTime() >= today.getTime();
+      })[0];
     posts.map(async (post, index) => {
-        let data = await Post.findOneAndUpdate({postId: post.postId}, {
-            tags: [], 
+        if (post?.tags?.type !== 'popular') {
+            let data = await Post.findOneAndUpdate({postId: post.postId}, {
+                tags: [], 
+            })
+        }
+    })
+    if (result.postId && result?.tags?.type !== 'popular') {
+        let data = await Post.findOneAndUpdate({postId: posts[0].postId}, {
+            tags: [{
+                type: 'popular',
+                text: 'Популярный',
+                color: "#F05353",
+            }],  
         })
-    })
-    let data = await Post.findOneAndUpdate({postId: result.postId}, {
-        tags: [{
-            type: 'postday',
-            text: 'Пост дня',
-            color: "#F05353",
-        }],  
-    })
-    console.log(data)
-    console.log('Задача выполнилась в ' + new Date());
+    }
+    if (result.postId && result?.tags?.type !== 'postday') {
+        let data = await Post.findOneAndUpdate({postId: result.postId}, {
+            tags: [{
+                type: 'postday',
+                text: 'Пост дня',
+                color: "#F05353",
+            }],  
+        })
+    }
 });
 
 const UrlDB = process.env.UrlDB
