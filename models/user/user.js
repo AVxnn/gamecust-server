@@ -41,6 +41,9 @@ const userSchema = new Schema({
     avatarPath: {
         type: String,
     },
+    bgPath: {
+        type: String,
+    },
     iconActive: {
         type: String,
         default: ''

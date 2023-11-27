@@ -148,6 +148,7 @@ class UserService {
         user.iconActive = data.iconActive || user.iconActive;
         user.private = data.private || user.private;
         user.avatarPath = data.avatarPath || user.avatarPath;
+        user.bgPath = data.bgPath || user.bgPath;
         const posts = await Post.find({userId: {$regex: new RegExp(`^${data.id}$`, 'i')}}).sort({publishedDate: "desc"});
         for (const post of posts) {
             await Post.findOneAndUpdate({postId: post.postId}, {
@@ -166,6 +167,13 @@ class UserService {
         }
         await user.save()
         return {user: user};
+    }
+
+    async getTopUsers() {
+        const users = await User.find().sort({ viewsCount: -1, publishedDate: -1 });
+        const res = users.sort((item) => item.subscribers.length).slice(0, 5)
+        console.log(res)
+        return res;
     }
 }
 

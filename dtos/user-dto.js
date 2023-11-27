@@ -11,6 +11,7 @@ export default class UserDto {
   icons;
   subscriptions;
   avatarPath;
+  bgPath;
 
   constructor(model) {
     this.username = model.username;
@@ -25,5 +26,6 @@ export default class UserDto {
     this.iconActive = model.iconActive;
     this.icons = model.icons;
     this.avatarPath = model.avatarPath;
+    this.bgPath = model.bgPath;
   }
 }

@@ -170,6 +170,16 @@ class UserController {
       next(error);
     }
   }
+
+  async getTopUsers(req, res, next) {
+    try {
+      const user = await userService.getTopUsers();
+      console.log(user);
+      return res.json(user);
+    } catch (error) {
+      next(error);
+    }
+  }
 }
 
 export default new UserController();
