@@ -23,6 +23,10 @@ const userSchema = new Schema({
         type: String,
         required: true 
     },
+    premium: {
+        type: Boolean,
+        required: false 
+    },
     isActivated: {
         type: Boolean,
         default: false

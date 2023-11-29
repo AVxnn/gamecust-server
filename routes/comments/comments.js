@@ -55,15 +55,43 @@ router.get("/comment/getComments/:postid", async (req, res) => {
   }
 });
 
+// Просмотр всех комментариев определенного человека
+router.get("/comment/getCommentsId/:uId", async (req, res) => {
+  const { uId } = req.params;
+  const startOfDay = new Date();
+  startOfDay.setHours(0, 0, 0, 0);
+  const startOfDayUnix = Math.floor(startOfDay.getTime() / 1000);
+  // Конец сегодняшнего дня
+  const endOfDay = new Date();
+  endOfDay.setHours(23, 59, 59, 999);
+  const endOfDayUnix = Math.floor(endOfDay.getTime() / 1000);
+
+  try {
+    const comments = await Comment.find({
+      userId: uId,
+      createdAt: { $gte: startOfDayUnix, $lte: endOfDayUnix },
+    })
+    .sort({ createdAt: 'asc' })  // Сортировка по возрастанию даты
+    .then((comments) => {
+      console.log('Комментарии за сегодня:', comments);
+      res.json(comments);
+    })
+    .catch((error) => {
+      console.error('Ошибка при получении комментариев:', error);
+    });
+  } catch (error) {
+    res.status(400);
+    res.json(`Error`);
+  }
+});
+
 // создание
 router.post("/comment/create", jsonParser, async (req, res) => {
   const { data } = req.body;
-  console.log("comment", data);
   try {
     const postData = await Post.findOne({
       postId: data.postId,
     });
-    console.log('test 1', postData)
     const article = new Comment({
       text: data.text,
       image: data.image,
@@ -77,8 +105,6 @@ router.post("/comment/create", jsonParser, async (req, res) => {
       likes: [],
       replies: [],
     });
-
-    console.log('test 2', article)
     const post = await Post.findOneAndUpdate(
       { postId: data.postId },
       {
@@ -86,8 +112,6 @@ router.post("/comment/create", jsonParser, async (req, res) => {
         commentsCount: postData.commentsCount + 1,
       }
     );
-
-    console.log('test 3', post)
     await article.save();
     res.json({
       title: "Комментарий создан",
@@ -102,7 +126,6 @@ router.post("/comment/create", jsonParser, async (req, res) => {
 // ответ
 router.post("/comment/reply", jsonParser, async (req, res) => {
   const { data } = req.body;
-  console.log("comment", data);
   try {
     const postData = await Post.findOne({
       postId: data.postId,
@@ -150,7 +173,7 @@ router.post("/comment/delete/:id", async (req, res) => {
     const postData = await Post.findOne({
       postId: data.postId,
     });
-    const newComments = postdata.comments.filter((id) => id !== data.commentId)
+    const newComments = postdata.comments.filter((id) => id !== data.commentId);
     await Comment.deleteOne({ postId: { $regex: new RegExp(`^${id}$`, "i") } })
       .then(function () {
         console.log("Post deleted"); // Success
@@ -161,9 +184,7 @@ router.post("/comment/delete/:id", async (req, res) => {
     const post = await Post.findOneAndUpdate(
       { postId: data.postId },
       {
-        comments: [
-          ...newComments,
-        ],
+        comments: [...newComments],
         commentsCount: postData.commentsCount - 1,
       }
     );
