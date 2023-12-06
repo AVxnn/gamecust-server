@@ -101,7 +101,6 @@ router.get("/post/getPosts/:uid/:page", async (req, res) => {
 // создание
 router.post("/post/create", jsonParser, async (req, res) => {
   const { data } = req.body;
-  console.log(data);
   try {
     const article = new Post({
       title: data.title,
@@ -136,7 +135,6 @@ router.post("/post/create", jsonParser, async (req, res) => {
 // удаление
 router.get("/post/delete/:id", async (req, res) => {
   const { id } = req.params;
-  console.log("detele", id);
   try {
     await Post.deleteOne({ postId: { $regex: new RegExp(`^${id}$`, "i") } })
       .then(function () {
@@ -159,7 +157,6 @@ router.get("/post/delete/:id", async (req, res) => {
 // редактирование
 router.post("/post/update/:id", async (req, res) => {
   const { data } = req.body;
-  console.log("work", data);
   try {
     const post = await Post.findOneAndUpdate(
       { postId: data.postId },
@@ -202,9 +199,7 @@ router.post("/post/update/:id", async (req, res) => {
         viewsCount: 0,
       });
       await article.save();
-      console.log("create", article);
     }
-    console.log("put", post);
     res.status(200);
     res.json({
       title: "Пост обновлен",
@@ -218,7 +213,6 @@ router.post("/post/update/:id", async (req, res) => {
 // add view counter
 router.get("/post/view/:id/:userId", async (req, res) => {
   const { id, userId } = req.params;
-  console.log("view", id, userId);
   try {
     const postData = await Post.findOne({
       postId: id,
@@ -230,7 +224,6 @@ router.get("/post/view/:id/:userId", async (req, res) => {
       });
       return true;
     }
-    console.log(postData)
     const post = await Post.findOneAndUpdate(
       { postId: id },
       {
@@ -238,7 +231,6 @@ router.get("/post/view/:id/:userId", async (req, res) => {
         viewsCount: postData.viewsCount + 1,
       }
     );
-    console.log("put", post);
     res.status(200);
     res.json({
       title: "Пост просмотрен",
