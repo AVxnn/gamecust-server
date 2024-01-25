@@ -17,7 +17,9 @@ router.get("/comment/getComment/:id", async (req, res) => {
   try {
     const post = await Comment.findOne({
       postId: { $regex: new RegExp(`^${id}$`, "i") },
-    });
+    })
+      .populate("user")
+      .exec();
     console.log("comments", id);
     await res.json(post);
   } catch (error) {
@@ -46,7 +48,10 @@ router.get("/comment/getComments/user/:page", async (req, res) => {
 router.get("/comment/getComments/:postid", async (req, res) => {
   const { postid } = req.params;
   try {
-    const posts = await Comment.find({ postId: postid }).sort();
+    const posts = await Comment.find({ postId: postid })
+      .sort()
+      .populate("user")
+      .exec();
 
     await res.json(posts);
   } catch (error) {
@@ -68,17 +73,17 @@ router.get("/comment/getCommentsId/:uId", async (req, res) => {
 
   try {
     const comments = await Comment.find({
-      userId: uId,
+      user: uId,
       createdAt: { $gte: startOfDayUnix, $lte: endOfDayUnix },
     })
-    .sort({ createdAt: 'asc' })  // Сортировка по возрастанию даты
-    .then((comments) => {
-      console.log('Комментарии за сегодня:', comments);
-      res.json(comments);
-    })
-    .catch((error) => {
-      console.error('Ошибка при получении комментариев:', error);
-    });
+      .sort({ createdAt: "asc" }) // Сортировка по возрастанию даты
+      .then((comments) => {
+        console.log("Комментарии за сегодня:", comments);
+        res.json(comments);
+      })
+      .catch((error) => {
+        console.error("Ошибка при получении комментариев:", error);
+      });
   } catch (error) {
     res.status(400);
     res.json(`Error`);
@@ -95,20 +100,20 @@ router.post("/comment/create", jsonParser, async (req, res) => {
     const article = new Comment({
       text: data.text,
       image: data.image,
-      author: data.author,
-      AvatarPath: data.avatarPath,
-      userId: data.userId,
+      user: data.user,
       postId: data.postId,
-      repliesId: data.repliesId,
-      commentId: data.commentId,
+      receiver: data.receiver,
       createdAt: `${Date.now()}`,
       likes: [],
-      replies: [],
     });
-    const post = await Post.findOneAndUpdate(
+    console.log("222", article);
+    await Post.findOneAndUpdate(
       { postId: data.postId },
       {
-        comments: [...postData.comments, data.commentId],
+        comments: [
+          ...postData.comments,
+          { commentId: article._id, receiver: data.receiver },
+        ],
         commentsCount: postData.commentsCount + 1,
       }
     );
@@ -133,22 +138,19 @@ router.post("/comment/reply", jsonParser, async (req, res) => {
     const article = new Comment({
       text: data.text,
       image: data.image,
-      author: data.author,
-      AvatarPath: data.avatarPath,
-      userId: data.userId,
+      user: data.user,
       postId: data.postId,
-      repliesId: data.repliesId,
+      receiver: data.receiver,
       commentId: data.commentId,
       createdAt: `${Date.now()}`,
       likes: [],
-      replies: [],
     });
     const post = await Post.findOneAndUpdate(
       { postId: data.postId },
       {
         comments: [
           ...postData.comments,
-          { commentId: data.commentId, repliesId: data.repliesId },
+          { commentId: article._id, receiver: data.receiver },
         ],
         commentsCount: postData.commentsCount + 1,
       }
@@ -199,48 +201,48 @@ router.post("/comment/delete/:id", async (req, res) => {
 });
 
 // редактирование
-router.post("/comment/update/:id", async (req, res) => {
-  const { data } = req.body;
-  console.log("work", data);
-  try {
-    const post = await Comment.findOneAndUpdate(
-      { postId: data.postId },
-      {
-        text: data.text,
-        image: data.image,
-        author: data.author,
-        AvatarPath: data.avatarPath,
-        userId: data.userId,
-        createdAt: data.createdAt,
-        commentId: data.commentId,
-        likes: [],
-        replies: [],
-      }
-    );
-    if (!post) {
-      const article = new Comment({
-        text: data.text,
-        image: data.image,
-        author: data.author,
-        AvatarPath: data.avatarPath,
-        userId: data.userId,
-        createdAt: data.createdAt,
-        commentId: data.commentId,
-        likes: [],
-        replies: [],
-      });
-      await article.save();
-      console.log("create", article);
-    }
-    console.log("put", post);
-    res.status(200);
-    res.json({
-      title: "Комментарий обновлен",
-    });
-  } catch (error) {
-    res.status(400);
-    res.json(`Error`);
-  }
-});
+// router.post("/comment/update/:id", async (req, res) => {
+//   const { data } = req.body;
+//   console.log("work", data);
+//   try {
+//     const post = await Comment.findOneAndUpdate(
+//       { postId: data.postId },
+//       {
+//         text: data.text,
+//         image: data.image,
+//         author: data.author,
+//         AvatarPath: data.avatarPath,
+//         userId: data.userId,
+//         createdAt: data.createdAt,
+//         commentId: data.commentId,
+//         likes: [],
+//         replies: [],
+//       }
+//     );
+//     if (!post) {
+//       const article = new Comment({
+//         text: data.text,
+//         image: data.image,
+//         author: data.author,
+//         AvatarPath: data.avatarPath,
+//         userId: data.userId,
+//         createdAt: data.createdAt,
+//         commentId: data.commentId,
+//         likes: [],
+//         replies: [],
+//       });
+//       await article.save();
+//       console.log("create", article);
+//     }
+//     console.log("put", post);
+//     res.status(200);
+//     res.json({
+//       title: "Комментарий обновлен",
+//     });
+//   } catch (error) {
+//     res.status(400);
+//     res.json(`Error`);
+//   }
+// });
 
 export default router;

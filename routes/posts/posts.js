@@ -17,7 +17,9 @@ router.get("/post/getPost/:id", async (req, res) => {
   try {
     const post = await Post.findOne({
       postId: { $regex: new RegExp(`^${id}$`, "i") },
-    });
+    })
+      .populate("user")
+      .exec();
     console.log(post);
     await res.json(post);
   } catch (error) {
@@ -36,7 +38,9 @@ router.get("/post/getPosts/filter/:filterParams/:page", async (req, res) => {
     })
       .skip(skip)
       .limit(limit)
-      .sort({ publishedDate: "desc" });
+      .sort({ publishedDate: "desc" })
+      .populate("user")
+      .exec();
     await res.json(post);
   } catch (error) {
     res.status(404);
@@ -52,7 +56,9 @@ router.get("/post/getPosts/rec/:page", async (req, res) => {
     const post = await Post.find({ published: true })
       .skip(skip)
       .limit(limit)
-      .sort({ viewsCount: -1, publishedDate: -1 });
+      .sort({ viewsCount: -1, publishedDate: -1 })
+      .populate("user")
+      .exec();
     await res.json(post);
   } catch (error) {
     res.status(404);
@@ -69,7 +75,9 @@ router.get("/post/getPosts/:page", async (req, res) => {
     const posts = await Post.find({ published: true })
       .skip(skip)
       .limit(limit)
-      .sort({ publishedDate: "desc" });
+      .sort({ publishedDate: "desc" })
+      .populate("user")
+      .exec();
 
     await res.json(posts);
   } catch (error) {

@@ -10,6 +10,7 @@ export default class UserDto {
   iconActive;
   icons;
   subscriptions;
+  roles;
   avatarPath;
   bgPath;
 
@@ -25,6 +26,7 @@ export default class UserDto {
     this.private = model.private;
     this.iconActive = model.iconActive;
     this.icons = model.icons;
+    this.roles = model.roles;
     this.avatarPath = model.avatarPath;
     this.bgPath = model.bgPath;
   }

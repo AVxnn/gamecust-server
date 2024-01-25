@@ -2,13 +2,14 @@ import mongoose from "mongoose";
 const { Schema, model } = mongoose;
 
 const postSchema = new Schema({
-  username: String,
-  userAvatar: String,
   userId: String,
   published: Boolean,
   publishedDate: String,
   postId: String,
-  iconActive: String,
+  user: {
+    type: Schema.Types.ObjectId,
+    ref: "User",
+  },
   data: [],
   stared: [],
   tags: [],
@@ -20,7 +21,7 @@ const postSchema = new Schema({
     },
   ],
   likes: [],
-  comments: [String],
+  comments: [],
   commentsCount: Number,
   views: [String],
   viewsCount: Number,
