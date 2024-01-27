@@ -1,6 +1,7 @@
 import express from "express";
 import mongoose from "mongoose";
 import Post from "../../models/post/post.js";
+import User from "../../models/user/user.js";
 import bodyParser from "body-parser";
 import dotenv from "dotenv";
 import { v4 } from "uuid";
@@ -60,6 +61,29 @@ router.get("/post/getPosts/rec/:page", async (req, res) => {
       .populate("user")
       .exec();
     await res.json(post);
+  } catch (error) {
+    res.status(404);
+    res.json(`Такой идентификатор не найден попробуйте другой`);
+  }
+});
+
+router.get("/post/getPosts/subs/:id/:page", async (req, res) => {
+  let { page, id } = req.params;
+  const limit = 10;
+  const skip = page * limit;
+  try {
+    const user = await User.findById(id);
+    const targetUserIds = user.subscriptions;
+    console.log("user", targetUserIds);
+    const posts = await Post.find({
+      userId: { $in: targetUserIds },
+    })
+      .skip(skip)
+      .limit(limit)
+      .sort({ viewsCount: -1, publishedDate: -1 })
+      .populate("user")
+      .exec();
+    await res.json(posts);
   } catch (error) {
     res.status(404);
     res.json(`Такой идентификатор не найден попробуйте другой`);

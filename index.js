@@ -6,6 +6,7 @@ import comments from "./routes/comments/comments.js";
 import level from "./routes/level/level.js";
 import auth from "./routes/auth/auth.js";
 import notification from "./routes/notification/notification.js";
+import search from "./routes/search/search.js";
 import fileUpload from "express-fileupload";
 import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
@@ -46,6 +47,7 @@ app.use("/api", file);
 app.use("/api", comments);
 app.use("/api", level);
 app.use("/api", notification);
+app.use("/api", search);
 app.use(error);
 
 app.get("/", async (req, res) => {
