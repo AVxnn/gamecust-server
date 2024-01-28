@@ -16,7 +16,6 @@ router.get("/notification/:uId", async (req, res) => {
     const notification = await Notification.find({ receiver: uId })
       .populate("user")
       .exec();
-    console.log("notification", notification);
     await res.json(notification);
   } catch (error) {
     res.status(400);
@@ -35,7 +34,6 @@ router.get("/notifications/:uId/:page", async (req, res) => {
       .skip(skip)
       .limit(limit)
       .sort({ publishedDate: "desc" });
-    console.log("notification", notification);
     await res.json(notification);
   } catch (error) {
     res.status(400);
@@ -46,8 +44,6 @@ router.get("/notifications/:uId/:page", async (req, res) => {
 router.post(`/notification/create/:uId`, async (req, res) => {
   const { uId } = req.params;
   const data = req.body;
-
-  console.log("n", data, uId);
   try {
     const notification = new Notification({
       receiver: data.receiver,
@@ -58,7 +54,6 @@ router.post(`/notification/create/:uId`, async (req, res) => {
       status: data.status,
       viewed: false,
     });
-    console.log("notification", notification);
     await notification.save();
     await res.json(notification);
   } catch (error) {
@@ -70,13 +65,7 @@ router.post(`/notification/create/:uId`, async (req, res) => {
 router.post(`/notification/delete/:id`, async (req, res) => {
   const { id } = req.params;
   try {
-    await Notification.deleteOne({ _id: id })
-      .then(function () {
-        console.log("Ntfc deleted"); // Success
-      })
-      .catch(function (error) {
-        console.log(error); // Failure
-      });
+    await Notification.deleteOne({ _id: id });
     await res.json({
       title: "Пост удален",
       Notification: Notification,

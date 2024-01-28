@@ -20,7 +20,6 @@ router.get("/comment/getComment/:id", async (req, res) => {
     })
       .populate("user")
       .exec();
-    console.log("comments", id);
     await res.json(post);
   } catch (error) {
     res.status(404);
@@ -78,7 +77,6 @@ router.get("/comment/getCommentsId/:uId", async (req, res) => {
     })
       .sort({ createdAt: "asc" }) // Сортировка по возрастанию даты
       .then((comments) => {
-        console.log("Комментарии за сегодня:", comments);
         res.json(comments);
       })
       .catch((error) => {
@@ -106,7 +104,6 @@ router.post("/comment/create", jsonParser, async (req, res) => {
       createdAt: `${Date.now()}`,
       likes: [],
     });
-    console.log("222", article);
     await Post.findOneAndUpdate(
       { postId: data.postId },
       {
@@ -170,19 +167,12 @@ router.post("/comment/reply", jsonParser, async (req, res) => {
 // удаление
 router.post("/comment/delete/:id", async (req, res) => {
   const { data } = req.body;
-  console.log("detele", id);
   try {
     const postData = await Post.findOne({
       postId: data.postId,
     });
     const newComments = postdata.comments.filter((id) => id !== data.commentId);
-    await Comment.deleteOne({ postId: { $regex: new RegExp(`^${id}$`, "i") } })
-      .then(function () {
-        console.log("Post deleted"); // Success
-      })
-      .catch(function (error) {
-        console.log(error); // Failure
-      });
+    await Comment.deleteOne({ postId: { $regex: new RegExp(`^${id}$`, "i") } });
     const post = await Post.findOneAndUpdate(
       { postId: data.postId },
       {

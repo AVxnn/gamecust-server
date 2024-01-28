@@ -15,11 +15,14 @@ router.get("/search", async (req, res) => {
   try {
     const postsQuery = await Post.find({
       "data.0.value": { $regex: q, $options: "i" }, // Найти совпадения в поле data[0].value (без учета регистра)
-    });
+      published: true,
+    })
+      .limit(10)
+      .sort({ viewsCount: -1, publishedDate: -1 });
 
     const usersQuery = await User.find({
       username: { $regex: q, $options: "i" }, // Найти совпадения в поле data[0].value (без учета регистра)
-    });
+    }).limit(5);
 
     res.json({
       posts: postsQuery,

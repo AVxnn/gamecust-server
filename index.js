@@ -7,6 +7,7 @@ import level from "./routes/level/level.js";
 import auth from "./routes/auth/auth.js";
 import notification from "./routes/notification/notification.js";
 import search from "./routes/search/search.js";
+import categories from "./routes/categories/categories.js";
 import fileUpload from "express-fileupload";
 import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
@@ -37,8 +38,8 @@ app.use(fileUpload({}));
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
 
-app.use("", express.static("static"));
-app.use("", express.static("avatars"));
+app.use("/static", express.static(path.join(__dirname, "static")));
+app.use("/avatars", express.static(path.join(__dirname, "avatars")));
 app.use("/comments", express.static(path.join(__dirname, "comments")));
 
 app.use("/api", auth);
@@ -48,6 +49,7 @@ app.use("/api", comments);
 app.use("/api", level);
 app.use("/api", notification);
 app.use("/api", search);
+app.use("/api", categories);
 app.use(error);
 
 app.get("/", async (req, res) => {

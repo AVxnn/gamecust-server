@@ -2,7 +2,6 @@ import mongoose from "mongoose";
 const { Schema, model } = mongoose;
 
 const postSchema = new Schema({
-  userId: String,
   published: Boolean,
   publishedDate: String,
   postId: String,
@@ -10,17 +9,22 @@ const postSchema = new Schema({
     type: Schema.Types.ObjectId,
     ref: "User",
   },
+  category: {
+    type: Schema.Types.ObjectId,
+    ref: "Categories",
+    required: false,
+  },
   data: [],
   stared: [],
   tags: [],
-  hashtags: [
+  likes: [
     {
-      type: String,
-      text: String,
-      color: String,
+      user: {
+        type: Schema.Types.ObjectId,
+        ref: "User",
+      },
     },
   ],
-  likes: [],
   comments: [],
   commentsCount: Number,
   views: [String],

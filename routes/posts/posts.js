@@ -2,8 +2,10 @@ import express from "express";
 import mongoose from "mongoose";
 import Post from "../../models/post/post.js";
 import User from "../../models/user/user.js";
+import Categories from "../../models/categories/categories.js";
 import bodyParser from "body-parser";
 import dotenv from "dotenv";
+import { ObjectId } from "mongodb";
 import { v4 } from "uuid";
 dotenv.config();
 
@@ -14,14 +16,13 @@ const router = express.Router();
 // просмотр определенного поста
 router.get("/post/getPost/:id", async (req, res) => {
   const { id } = req.params;
-  console.log(id);
   try {
     const post = await Post.findOne({
       postId: { $regex: new RegExp(`^${id}$`, "i") },
     })
       .populate("user")
+      .populate("category")
       .exec();
-    console.log(post);
     await res.json(post);
   } catch (error) {
     res.status(404);
@@ -35,16 +36,40 @@ router.get("/post/getPosts/filter/:filterParams/:page", async (req, res) => {
   const skip = page * limit;
   try {
     const post = await Post.find({
-      userId: { $regex: new RegExp(`^${filterParams}$`, "i") },
+      user: filterParams,
     })
       .skip(skip)
       .limit(limit)
       .sort({ publishedDate: "desc" })
       .populate("user")
+      .populate("category")
       .exec();
     await res.json(post);
   } catch (error) {
     res.status(404);
+    res.json(`Такой идентификатор не найден попробуйте другой`);
+  }
+});
+
+router.get("/post/getPosts/category/:filterParams/:page", async (req, res) => {
+  const { filterParams, page } = req.params;
+  const limit = 10;
+  const skip = page * limit;
+  try {
+    const post = await Post.find({
+      published: true,
+      category: filterParams,
+    })
+      .skip(skip)
+      .limit(limit)
+      .sort({ publishedDate: "desc" })
+      .populate("user")
+      .populate("category")
+      .exec();
+    await res.json(post);
+  } catch (error) {
+    res.status(404);
+    console.log(error);
     res.json(`Такой идентификатор не найден попробуйте другой`);
   }
 });
@@ -59,6 +84,7 @@ router.get("/post/getPosts/rec/:page", async (req, res) => {
       .limit(limit)
       .sort({ viewsCount: -1, publishedDate: -1 })
       .populate("user")
+      .populate("category")
       .exec();
     await res.json(post);
   } catch (error) {
@@ -74,7 +100,6 @@ router.get("/post/getPosts/subs/:id/:page", async (req, res) => {
   try {
     const user = await User.findById(id);
     const targetUserIds = user.subscriptions;
-    console.log("user", targetUserIds);
     const posts = await Post.find({
       userId: { $in: targetUserIds },
     })
@@ -82,6 +107,7 @@ router.get("/post/getPosts/subs/:id/:page", async (req, res) => {
       .limit(limit)
       .sort({ viewsCount: -1, publishedDate: -1 })
       .populate("user")
+      .populate("category")
       .exec();
     await res.json(posts);
   } catch (error) {
@@ -101,6 +127,7 @@ router.get("/post/getPosts/:page", async (req, res) => {
       .limit(limit)
       .sort({ publishedDate: "desc" })
       .populate("user")
+      .populate("category")
       .exec();
 
     await res.json(posts);
@@ -117,12 +144,15 @@ router.get("/post/getPosts/:uid/:page", async (req, res) => {
   const skip = page * limit;
   try {
     const posts = await Post.find({
-      userId: uid,
+      user: uid,
       published: true,
     })
       .skip(skip)
       .limit(limit)
-      .sort({ publishedDate: "desc" });
+      .sort({ publishedDate: "desc" })
+      .populate("user")
+      .populate("category")
+      .exec();
     await res.json(posts);
   } catch (error) {
     res.status(400);
@@ -134,24 +164,32 @@ router.get("/post/getPosts/:uid/:page", async (req, res) => {
 router.post("/post/create", jsonParser, async (req, res) => {
   const { data } = req.body;
   try {
-    const article = new Post({
-      title: data.title,
-      description: data.description,
-      username: data.username,
-      userAvatar: data.userAvatar,
-      iconActive: data.iconActive,
-      postId: data.postId,
-      data: data.data,
-      stared: data.stared,
-      tags: data.tags,
-      images: [],
-      hashtags: data.hashtags,
-      likes: [],
-      comments: [],
-      commentsCount: 0,
-      views: [],
-      viewsCount: 0,
-    });
+    const post = await Post.findOneAndUpdate(
+      { postId: data.postId },
+      {
+        published: true,
+        publishedDate: `${Date.now()}`,
+        user: data.user,
+        category: data.category ? data.category : null,
+        postId: data.postId,
+        data: data.data,
+        stared: data.stared,
+        tags: data.tags,
+        likes: data.likes,
+        comments: data.comments,
+        commentsCount: data.commentsCount,
+        views: data.views,
+        viewsCount: data.viewsCount,
+      }
+    );
+
+    if (data.category) {
+      const CategoriesQuery = await Categories.findOne({ _id: data.category });
+      await Categories.findOneAndUpdate(
+        { _id: data.category },
+        { posts: +CategoriesQuery.posts + 1 }
+      );
+    }
 
     await article.save();
     res.json({
@@ -160,7 +198,8 @@ router.post("/post/create", jsonParser, async (req, res) => {
     });
   } catch (error) {
     res.status(400);
-    res.json(`Error`);
+    console.log(error);
+    res.json(error.message);
   }
 });
 
@@ -168,13 +207,18 @@ router.post("/post/create", jsonParser, async (req, res) => {
 router.get("/post/delete/:id", async (req, res) => {
   const { id } = req.params;
   try {
-    await Post.deleteOne({ postId: { $regex: new RegExp(`^${id}$`, "i") } })
-      .then(function () {
-        console.log("Post deleted"); // Success
-      })
-      .catch(function (error) {
-        console.log(error); // Failure
-      });
+    const post = await Post.findOne({
+      postId: { $regex: new RegExp(`^${id}$`, "i") },
+    });
+    await Post.deleteOne({ postId: { $regex: new RegExp(`^${id}$`, "i") } });
+
+    if (data.category) {
+      const CategoriesQuery = await Categories.findOne({ _id: data.category });
+      await Categories.findOneAndUpdate(
+        { _id: data.category },
+        { posts: +CategoriesQuery.posts - 1 }
+      );
+    }
 
     res.status(200);
     res.json({
@@ -187,23 +231,18 @@ router.get("/post/delete/:id", async (req, res) => {
 });
 
 // редактирование
-router.post("/post/update/:id", async (req, res) => {
+router.post("/post/update", async (req, res) => {
   const { data } = req.body;
   try {
     const post = await Post.findOneAndUpdate(
       { postId: data.postId },
       {
-        username: data.username,
-        userAvatar: data.userAvatar,
-        userId: data.userId,
-        iconActive: data.iconActive,
         published: data.published,
-        publishedDate: data.publishedDate,
-        postId: data.postId,
+        user: data.user,
+        category: data.category ? data.category : null,
         data: data.data,
         stared: data.stared,
         tags: data.tags,
-        hashtags: data.hashtags,
         likes: data.likes,
         comments: data.comments,
         commentsCount: data.commentsCount,
@@ -213,17 +252,14 @@ router.post("/post/update/:id", async (req, res) => {
     );
     if (!post) {
       const article = new Post({
-        username: data.username,
-        userAvatar: data.userAvatar,
-        userId: data.userId,
-        iconActive: data.iconActive,
+        user: data.user,
+        category: data.category ? data.category : null,
         published: data.published,
-        publishedDate: data.publishedDate,
+        publishedDate: `${Date.now()}`,
         postId: data.postId,
         data: data.data,
         stared: data.stared,
         tags: data.tags,
-        hashtags: data.hashtags,
         likes: [],
         comments: [],
         commentsCount: 0,
@@ -233,11 +269,10 @@ router.post("/post/update/:id", async (req, res) => {
       await article.save();
     }
     res.status(200);
-    res.json({
-      title: "Пост обновлен",
-    });
+    res.json({ post });
   } catch (error) {
     res.status(400);
+    console.log(error);
     res.json(`Error`);
   }
 });
@@ -256,6 +291,7 @@ router.get("/post/view/:id/:userId", async (req, res) => {
       });
       return true;
     }
+    const oldDocument = await Post.findOne({ postId: id });
     const post = await Post.findOneAndUpdate(
       { postId: id },
       {
@@ -269,6 +305,62 @@ router.get("/post/view/:id/:userId", async (req, res) => {
     });
   } catch (error) {
     res.status(400);
+    res.json(`Error`);
+  }
+});
+
+router.post("/post/like", async (req, res) => {
+  const data = req.body;
+  try {
+    const postData = await Post.findOne({
+      postId: data.postId,
+    })
+      .populate("user")
+      .exec();
+    if (
+      postData?.likes?.filter(
+        (likes) => new ObjectId(likes.user).valueOf() === data.user
+      ).length > 0
+    ) {
+      const resultData = await Post.findOneAndUpdate(
+        { postId: data.postId },
+        {
+          likes: [
+            ...postData.likes.filter(
+              (likes) => new ObjectId(likes.user).valueOf() !== data.user
+            ),
+          ],
+        }
+      );
+
+      res.json({
+        title: "Лайк убран",
+        likes: [
+          ...postData.likes.filter(
+            (likes) => new ObjectId(likes.user).valueOf() !== data.user
+          ),
+        ],
+      });
+      return null;
+    } else {
+      const resultData = await Post.findOneAndUpdate(
+        { postId: data.postId },
+        {
+          likes: [...postData.likes, { user: data.user }],
+        }
+      )
+        .populate("user")
+        .populate("category")
+        .exec();
+      res.status(200);
+      res.json({
+        title: "Лайк поставлен",
+        likes: [...postData.likes, { user: data.user }],
+      });
+    }
+  } catch (error) {
+    res.status(400);
+    console.log(error);
     res.json(`Error`);
   }
 });
