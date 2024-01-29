@@ -39,13 +39,9 @@ app.use(fileUpload({}));
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
 
-// app.use("/static", express.static(path.join(__dirname, "static")));
-// app.use("/avatars", express.static(path.join(__dirname, "avatars")));
-// app.use("/comments", express.static(path.join(__dirname, "comments")));
-
-app.use(express.static(path.join(__dirname, "static")));
-app.use(express.static(path.join(__dirname, "avatars")));
-app.use(express.static(path.join(__dirname, "comments")));
+app.use("/static", express.static(path.join(__dirname, "static")));
+app.use("/avatars", express.static(path.join(__dirname, "avatars")));
+app.use("/comments", express.static(path.join(__dirname, "comments")));
 
 app.use("/api", auth);
 app.use("/api", posts);
