@@ -8,6 +8,7 @@ const notificationSchema = new Schema({
   description: String,
   status: String,
   viewed: Boolean,
+  unicId: String,
   user: {
     type: Schema.Types.ObjectId,
     ref: "User",

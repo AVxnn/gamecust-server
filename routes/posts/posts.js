@@ -2,6 +2,7 @@ import express from "express";
 import mongoose from "mongoose";
 import Post from "../../models/post/post.js";
 import User from "../../models/user/user.js";
+import NotificationService from "../../service/notification-service.js";
 import Categories from "../../models/categories/categories.js";
 import bodyParser from "body-parser";
 import dotenv from "dotenv";
@@ -101,7 +102,7 @@ router.get("/post/getPosts/subs/:id/:page", async (req, res) => {
     const user = await User.findById(id);
     const targetUserIds = user.subscriptions;
     const posts = await Post.find({
-      userId: { $in: targetUserIds },
+      user: { $in: targetUserIds },
     })
       .skip(skip)
       .limit(limit)
@@ -109,6 +110,7 @@ router.get("/post/getPosts/subs/:id/:page", async (req, res) => {
       .populate("user")
       .populate("category")
       .exec();
+    console.log(user, "posts", posts);
     await res.json(posts);
   } catch (error) {
     res.status(404);
@@ -313,17 +315,26 @@ router.post("/post/like", async (req, res) => {
   const data = req.body;
   try {
     const postData = await Post.findOne({
-      postId: data.postId,
+      postId: data.postId.postId,
     })
       .populate("user")
+      .populate("category")
       .exec();
+    const result = await NotificationService.checkSendAndDelete(
+      "",
+      "Поставил(а) лайк на ваш пост",
+      "like",
+      data.postId.user._id,
+      data.user,
+      data.postId.postId
+    );
     if (
       postData?.likes?.filter(
         (likes) => new ObjectId(likes.user).valueOf() === data.user
       ).length > 0
     ) {
       const resultData = await Post.findOneAndUpdate(
-        { postId: data.postId },
+        { postId: data.postId.postId },
         {
           likes: [
             ...postData.likes.filter(
@@ -332,7 +343,6 @@ router.post("/post/like", async (req, res) => {
           ],
         }
       );
-
       res.json({
         title: "Лайк убран",
         likes: [
@@ -344,7 +354,7 @@ router.post("/post/like", async (req, res) => {
       return null;
     } else {
       const resultData = await Post.findOneAndUpdate(
-        { postId: data.postId },
+        { postId: data.postId.postId },
         {
           likes: [...postData.likes, { user: data.user }],
         }

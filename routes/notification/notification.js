@@ -46,8 +46,8 @@ router.post(`/notification/create/:uId`, async (req, res) => {
   const data = req.body;
   try {
     const notification = new Notification({
-      receiver: data.receiver,
-      user: uId,
+      receiver: uId,
+      user: data.user,
       publishedDate: data.publishedDate,
       title: data.title,
       description: data.description || "",

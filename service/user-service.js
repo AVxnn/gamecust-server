@@ -41,16 +41,13 @@ class UserService {
 
   async registrationGoogle(username, email, picture, sub, email_verified) {
     const candidate = await User.findOne({ email });
-    console.log("w", email, username, picture);
     const hashPassword = await bcrypt.hash(sub, 5);
     if (candidate) {
       const isPassEquals = await bcrypt.compare(
         hashPassword,
         candidate.password
       );
-      console.log("yes", isPassEquals, hashPassword, candidate.password);
       const userDto = new UserDto(candidate);
-      console.log("www", userDto);
       const tokens = tokenService.generateTokens({ ...userDto });
 
       await tokenService.saveToken(userDto.id, tokens.refreshToken);
@@ -214,10 +211,10 @@ class UserService {
   }
 
   async addExp(data) {
-    const user = await User.findOne({ _id: data.id });
-    user.exp = +user.exp + +data.value;
-    await user.save();
-    return { user: user };
+    // const user = await User.findById(data.id);
+    // user.exp = +user.exp + +data.value;
+    // await user.save();
+    // return { user: user };
   }
 
   async removeExp(data) {

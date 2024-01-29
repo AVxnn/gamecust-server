@@ -40,7 +40,6 @@ router.get("/categories/getOne/:id", async (req, res) => {
 router.post("/categories/create", jsonParser, async (req, res) => {
   const { title, posts, imagePath, dataRelease } = req.body;
   try {
-    console.log(title, posts, imagePath, dataRelease);
     const categories = new Categories({
       title: title,
       posts: posts,
@@ -66,7 +65,7 @@ router.post("/categories/create", jsonParser, async (req, res) => {
 router.post("/categories/add/:id", jsonParser, async (req, res) => {
   const { id } = req.params;
   try {
-    console.log(title, posts, imagePath, dataRelease);
+    // console.log(title, posts, imagePath, dataRelease);
     const CategoriesQuery = await Categories.findOne({ _id: id });
     const Categories = await Categories.findOneAndUpdate(
       { _id: id },
@@ -84,7 +83,6 @@ router.post("/categories/add/:id", jsonParser, async (req, res) => {
 router.post("/categories/remove/:id", jsonParser, async (req, res) => {
   const { id } = req.params;
   try {
-    console.log(title, posts, imagePath, dataRelease);
     const CategoriesQuery = await Categories.findOne({ _id: id });
     const Categories = await Categories.findOneAndUpdate(
       { _id: id },

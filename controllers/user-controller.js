@@ -32,7 +32,6 @@ class UserController {
 
   async registrationGoogle(req, res, next) {
     try {
-      console.log(req.body);
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
         return next(
@@ -104,7 +103,6 @@ class UserController {
   async addSubscriptions(req, res, next) {
     try {
       const { id, uId } = req.body;
-      console.log(id, uId);
       const userData = await userService.addSubscriptions(id, uId);
       return res.json(userData);
     } catch (error) {
@@ -115,10 +113,8 @@ class UserController {
   async reSaveData(req, res, next) {
     try {
       const { data } = req.body;
-      console.log(data);
       const userData = await userService.reSaveData(data);
-      
-      console.log(res.json(await userData));
+
       return res.json(await userData);
     } catch (error) {
       next(error);
@@ -135,7 +131,6 @@ class UserController {
         secure: true,
         sameSite: "none",
       });
-      console.log("checkrefresh", refreshToken);
       return res.json(userData);
     } catch (error) {
       next(error);
@@ -164,7 +159,6 @@ class UserController {
     try {
       const id = req.params.id;
       const user = await userService.getUserId(id);
-      console.log("userID", user);
       return res.json(user);
     } catch (error) {
       next(error);
@@ -174,7 +168,6 @@ class UserController {
   async getTopUsers(req, res, next) {
     try {
       const user = await userService.getTopUsers();
-      console.log(user);
       return res.json(user);
     } catch (error) {
       next(error);
@@ -184,9 +177,7 @@ class UserController {
   async addExpUser(req, res, next) {
     try {
       const data = req.body;
-      console.log(data)
       const user = await userService.addExp(data);
-      console.log(user);
       return res.json(user);
     } catch (error) {
       next(error);
@@ -197,11 +188,11 @@ class UserController {
     try {
       const data = req.body;
       const user = await userService.removeExp(data);
-      console.log(user);
       return res.json(user);
     } catch (error) {
       next(error);
-    }removeExp
+    }
+    removeExp;
   }
 }
 
