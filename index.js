@@ -43,9 +43,9 @@ app.use(express.urlencoded({ extended: true }));
 // app.use("/avatars", express.static(path.join(__dirname, "avatars")));
 // app.use("/comments", express.static(path.join(__dirname, "comments")));
 
-app.use("", express.static("static"));
-app.use("", express.static("avatars"));
-app.use("", express.static("comments"));
+app.use(express.static(path.join(__dirname, "static")));
+app.use(express.static(path.join(__dirname, "avatars")));
+app.use(express.static(path.join(__dirname, "comments")));
 
 app.use("/api", auth);
 app.use("/api", posts);
