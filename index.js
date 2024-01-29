@@ -43,6 +43,10 @@ app.use("/static", express.static(path.join(__dirname, "static")));
 app.use("/avatars", express.static(path.join(__dirname, "avatars")));
 app.use("/comments", express.static(path.join(__dirname, "comments")));
 
+app.use("", express.static("static"));
+app.use("", express.static("avatars"));
+app.use("", express.static("comments"));
+
 app.use("/api", auth);
 app.use("/api", posts);
 app.use("/api", file);
