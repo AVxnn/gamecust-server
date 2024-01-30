@@ -24,6 +24,7 @@ router.get("/post/getPost/:id", async (req, res) => {
       .populate("user")
       .populate("category")
       .exec();
+    console.log(post);
     await res.json(post);
   } catch (error) {
     res.status(404);
@@ -241,7 +242,7 @@ router.post("/post/update", async (req, res) => {
       {
         published: data.published,
         user: data.user,
-        category: data.category ? data.category : null,
+        category: data.category,
         data: data.data,
         stared: data.stared,
         tags: data.tags,
@@ -255,13 +256,52 @@ router.post("/post/update", async (req, res) => {
     if (!post) {
       const article = new Post({
         user: data.user,
-        category: data.category ? data.category : null,
+        category: data.category,
         published: data.published,
         publishedDate: `${Date.now()}`,
         postId: data.postId,
         data: data.data,
         stared: data.stared,
         tags: data.tags,
+        likes: [],
+        comments: [],
+        commentsCount: 0,
+        views: [],
+        viewsCount: 0,
+      });
+      await article.save();
+    }
+    res.status(200);
+    res.json({ post });
+  } catch (error) {
+    res.status(400);
+    console.log(error);
+    res.json(`Error`);
+  }
+});
+
+router.post("/post/updatedata", async (req, res) => {
+  const { data } = req.body;
+  console.log(data.category);
+  try {
+    const post = await Post.findOneAndUpdate(
+      { postId: data.postId },
+      {
+        user: data.user,
+        category: data.category ? data.category : null,
+        data: data.data,
+      }
+    );
+    if (!post) {
+      const article = new Post({
+        user: data.user,
+        category: data?.category,
+        published: false,
+        publishedDate: `${Date.now()}`,
+        postId: data.postId,
+        data: data.data,
+        stared: data.stared,
+        tags: [],
         likes: [],
         comments: [],
         commentsCount: 0,

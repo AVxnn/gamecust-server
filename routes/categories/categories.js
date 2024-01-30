@@ -38,15 +38,16 @@ router.get("/categories/getOne/:id", async (req, res) => {
 });
 
 router.post("/categories/create", jsonParser, async (req, res) => {
-  const { title, posts, imagePath, dataRelease } = req.body;
+  const { title, posts, imagePath, dataRelease, description, bgPath } =
+    req.body;
   try {
     const categories = new Categories({
       title: title,
       posts: posts,
       imagePath: imagePath,
       dataRelease: dataRelease,
-      description: String,
-      bgPath: String,
+      description: description,
+      bgPath: bgPath,
       subscribers: [],
       subscriptions: [],
     });
