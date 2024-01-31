@@ -173,7 +173,7 @@ router.post("/post/create", jsonParser, async (req, res) => {
         published: true,
         publishedDate: `${Date.now()}`,
         user: data.user,
-        category: data.category ? data.category : null,
+        category: data?.category,
         postId: data.postId,
         data: data.data,
         stared: data.stared,
@@ -212,13 +212,18 @@ router.get("/post/delete/:id", async (req, res) => {
   try {
     const post = await Post.findOne({
       postId: { $regex: new RegExp(`^${id}$`, "i") },
-    });
+    })
+      .populate("user")
+      .populate("category")
+      .exec();
     await Post.deleteOne({ postId: { $regex: new RegExp(`^${id}$`, "i") } });
-
-    if (data.category) {
-      const CategoriesQuery = await Categories.findOne({ _id: data.category });
+    console.log(post);
+    if (post?.category) {
+      const CategoriesQuery = await Categories.findOne({
+        _id: post.category._id,
+      });
       await Categories.findOneAndUpdate(
-        { _id: data.category },
+        { _id: post.category._id },
         { posts: +CategoriesQuery.posts - 1 }
       );
     }
@@ -229,6 +234,7 @@ router.get("/post/delete/:id", async (req, res) => {
     });
   } catch (error) {
     res.status(400);
+    console.log(error);
     res.json(`Error`);
   }
 });
@@ -236,13 +242,15 @@ router.get("/post/delete/:id", async (req, res) => {
 // редактирование
 router.post("/post/update", async (req, res) => {
   const { data } = req.body;
+  console.log(data);
+
   try {
     const post = await Post.findOneAndUpdate(
       { postId: data.postId },
       {
         published: data.published,
         user: data.user,
-        category: data.category,
+        category: data?.category,
         data: data.data,
         stared: data.stared,
         tags: data.tags,
@@ -256,7 +264,7 @@ router.post("/post/update", async (req, res) => {
     if (!post) {
       const article = new Post({
         user: data.user,
-        category: data.category,
+        category: data?.category,
         published: data.published,
         publishedDate: `${Date.now()}`,
         postId: data.postId,
@@ -282,13 +290,13 @@ router.post("/post/update", async (req, res) => {
 
 router.post("/post/updatedata", async (req, res) => {
   const { data } = req.body;
-  console.log(data.category);
+  console.log("data?.category", data);
   try {
     const post = await Post.findOneAndUpdate(
       { postId: data.postId },
       {
         user: data.user,
-        category: data.category ? data.category : null,
+        category: data?.category,
         data: data.data,
       }
     );
