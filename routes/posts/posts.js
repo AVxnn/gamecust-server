@@ -173,7 +173,7 @@ router.post("/post/create", jsonParser, async (req, res) => {
         published: true,
         publishedDate: `${Date.now()}`,
         user: data.user,
-        category: data?.category,
+        category: data.category ? data.category : null,
         postId: data.postId,
         data: data.data,
         stared: data.stared,
@@ -194,7 +194,6 @@ router.post("/post/create", jsonParser, async (req, res) => {
       );
     }
 
-    await article.save();
     res.json({
       title: "Пост создан",
       infoTitle: article,

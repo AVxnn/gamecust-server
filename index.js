@@ -90,7 +90,7 @@ const w = schedule.scheduleJob("30 * * * *", async function () {
       );
     }
   });
-  if (result.postId && result?.tags?.type !== "popular") {
+  if (result?.postId && result?.tags?.type !== "popular") {
     let data = await Post.findOneAndUpdate(
       { postId: posts[0].postId },
       {
