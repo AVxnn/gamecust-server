@@ -38,4 +38,56 @@ router.get("/search", async (req, res) => {
   }
 });
 
+router.get("/search/posts/:page/:value", async (req, res) => {
+  let { page, value } = req.params;
+  const limit = 10;
+  const skip = page * limit;
+  try {
+    const postsQuery = await Post.find({
+      "data.0.value": { $regex: value, $options: "i" }, // Найти совпадения в поле data[0].value (без учета регистра)
+      published: true,
+    })
+      .skip(skip)
+      .limit(limit)
+      .sort({ viewsCount: -1, publishedDate: -1 })
+      .populate("user")
+      .populate("category")
+      .exec();
+
+    res.json(postsQuery);
+    // const user = await User.find({ receiver: uId })
+    //   .populate("user")
+    //   .exec()
+    //   .sort({ publishedDate: "desc" });
+  } catch (error) {
+    res.status(400);
+    console.log(error);
+    res.json(`Error`);
+  }
+});
+
+router.get("/search/users/:page/:value", async (req, res) => {
+  let { page, value } = req.params;
+  const limit = 10;
+  const skip = page * limit;
+  try {
+    const usersQuery = await User.find({
+      username: { $regex: value, $options: "i" }, // Найти совпадения в поле data[0].value (без учета регистра)
+    })
+      .skip(skip)
+      .limit(limit)
+      .exec();
+
+    res.json(usersQuery);
+    // const user = await User.find({ receiver: uId })
+    //   .populate("user")
+    //   .exec()
+    //   .sort({ publishedDate: "desc" });
+  } catch (error) {
+    res.status(400);
+    console.log(error);
+    res.json(`Error`);
+  }
+});
+
 export default router;
