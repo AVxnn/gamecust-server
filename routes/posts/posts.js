@@ -140,6 +140,22 @@ router.get("/post/getPosts/:page", async (req, res) => {
   }
 });
 
+// просмотр всех постов
+router.get("/post/getPosts/all", async (req, res) => {
+  try {
+    const posts = await Post.find({ published: true })
+      .sort({ publishedDate: "desc" })
+      .populate("user")
+      .populate("category")
+      .exec();
+
+    await res.json(posts);
+  } catch (error) {
+    res.status(400);
+    res.json(`Error`);
+  }
+});
+
 // Получить только опубликованные посты у пользователя
 router.get("/post/getPosts/:uid/:page", async (req, res) => {
   const { uid, page } = req.params;
