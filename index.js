@@ -69,7 +69,7 @@ async function start(PORT, UrlDB) {
   }
 }
 
-const w = schedule.scheduleJob("30 * * * *", async function () {
+const w = schedule.scheduleJob("20 * * * * *", async function () {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   let posts = await Post.find({ published: true }).sort({ viewsCount: -1 });
@@ -83,7 +83,7 @@ const w = schedule.scheduleJob("30 * * * *", async function () {
   posts.map(async (post, index) => {
     if (post?.tags?.type !== "popular") {
       let data = await Post.findOneAndUpdate(
-        { postId: post.postId },
+        { postId: post?.postId },
         {
           tags: [],
         }
@@ -92,7 +92,7 @@ const w = schedule.scheduleJob("30 * * * *", async function () {
   });
   if (result?.postId && result?.tags?.type !== "popular") {
     let data = await Post.findOneAndUpdate(
-      { postId: posts[0].postId },
+      { postId: posts[0]?.postId },
       {
         tags: [
           {
@@ -104,9 +104,9 @@ const w = schedule.scheduleJob("30 * * * *", async function () {
       }
     );
   }
-  if (result.postId && result?.tags?.type !== "postday") {
+  if (result?.postId && result?.tags?.type !== "postday") {
     let data = await Post.findOneAndUpdate(
-      { postId: result.postId },
+      { postId: result?.postId },
       {
         tags: [
           {
