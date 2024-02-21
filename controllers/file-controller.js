@@ -52,11 +52,15 @@ class FileController {
     try {
       const { id } = req.body;
       const { image } = req.files;
+      console.log("WOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOORK", image, id);
       const __filename = fileURLToPath(import.meta.url);
       let fileName;
       const __dirname = path.dirname(__filename);
       if (image) {
-        fileName = v4() + "." + image.name.match(/(png|jpg|jpeg|gif)/gm)[0];
+        fileName =
+          v4() +
+          "." +
+          image.name.toLowerCase().match(/(png|jpg|jpeg|gif)/gm)[0];
         image.mv(path.resolve(__dirname, "..", "avatars", fileName));
       }
       return res.json(
