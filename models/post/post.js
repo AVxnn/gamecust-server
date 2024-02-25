@@ -14,6 +14,7 @@ const postSchema = new Schema({
     ref: "Categories",
     required: false,
   },
+  title: String,
   data: [],
   stared: [],
   tags: [],
