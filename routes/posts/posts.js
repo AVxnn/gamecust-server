@@ -213,7 +213,7 @@ router.post("/post/create", jsonParser, async (req, res) => {
 
     res.json({
       title: "Пост создан",
-      infoTitle: article,
+      infoTitle: post,
     });
   } catch (error) {
     res.status(400);

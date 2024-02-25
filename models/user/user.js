@@ -48,6 +48,9 @@ const userSchema = new Schema({
     bgPath: {
         type: String,
     },
+    createdAt: {
+        type: String,
+    },
     iconActive: {
         type: String,
         default: ''

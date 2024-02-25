@@ -25,6 +25,7 @@ class UserService {
       rating,
       email,
       password: hashPassword,
+      createdAt: new Date(),
       activationLink,
     });
     await SendEmail(
@@ -62,6 +63,7 @@ class UserService {
       rating,
       email,
       avatarPath: picture,
+      createdAt: new Date(),
       password: hashPassword,
       activationLink: activationLink,
     });
