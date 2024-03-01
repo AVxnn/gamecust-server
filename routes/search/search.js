@@ -14,7 +14,7 @@ router.get("/search", async (req, res) => {
   const { q } = req.query;
   try {
     const postsQuery = await Post.find({
-      "data.0.value": { $regex: q, $options: "i" }, // Найти совпадения в поле data[0].value (без учета регистра)
+      title: { $regex: q, $options: "i" }, // Найти совпадения в поле data[0].value (без учета регистра)
       published: true,
     })
       .limit(10)
@@ -44,7 +44,7 @@ router.get("/search/posts/:page/:value", async (req, res) => {
   const skip = page * limit;
   try {
     const postsQuery = await Post.find({
-      "data.0.value": { $regex: value, $options: "i" }, // Найти совпадения в поле data[0].value (без учета регистра)
+      title: { $regex: value, $options: "i" }, // Найти совпадения в поле data[0].value (без учета регистра)
       published: true,
     })
       .skip(skip)
