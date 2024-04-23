@@ -25,15 +25,30 @@ router.get("/notification/:uId", async (req, res) => {
 
 router.get("/notifications/:uId/:page", async (req, res) => {
   const { uId, page } = req.params;
-  const limit = 10;
+  const limit = 20;
   const skip = page * limit;
   try {
     const notification = await Notification.find({ receiver: uId })
-      .populate("user")
-      .exec()
       .skip(skip)
       .limit(limit)
-      .sort({ publishedDate: "desc" });
+      .sort({ publishedDate: -1 })
+      .populate("user")
+      .exec();
+    await res.json(notification);
+  } catch (error) {
+    res.status(400);
+    res.json(`Error`);
+  }
+});
+router.post("/notifications/viewed/:uId", async (req, res) => {
+  const { uId } = req.params;
+  try {
+    console.log(uId);
+    const notification = await Notification.updateMany(
+      { receiver: uId }, // Условие выборки уведомлений
+      { $set: { viewed: true } } // Обновление поля viewed на true
+    );
+    console.log(notification);
     await res.json(notification);
   } catch (error) {
     res.status(400);
