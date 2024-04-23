@@ -74,7 +74,6 @@ router.get("/comment/getCommentsId/:uId", async (req, res) => {
       .catch((error) => {
         console.error("Ошибка при получении комментариев:", error);
       });
-    await res.json(comments);
   } catch (error) {
     res.status(400);
     res.json(`Error`);
