@@ -62,19 +62,11 @@ router.get("/comment/getComments/:postid", async (req, res) => {
 // Просмотр всех комментариев определенного человека
 router.get("/comment/getCommentsId/:uId", async (req, res) => {
   const { uId } = req.params;
-  const startOfDay = new Date();
-  startOfDay.setHours(0, 0, 0, 0);
-  const startOfDayUnix = Math.floor(startOfDay.getTime() / 1000);
-  // Конец сегодняшнего дня
-  const endOfDay = new Date();
-  endOfDay.setHours(23, 59, 59, 999);
-  const endOfDayUnix = Math.floor(endOfDay.getTime() / 1000);
-
   try {
     const comments = await Comment.find({
       user: uId,
-      createdAt: { $gte: startOfDayUnix, $lte: endOfDayUnix },
     })
+      .populate("user")
       .sort({ createdAt: "asc" }) // Сортировка по возрастанию даты
       .then((comments) => {
         res.json(comments);
@@ -82,6 +74,7 @@ router.get("/comment/getCommentsId/:uId", async (req, res) => {
       .catch((error) => {
         console.error("Ошибка при получении комментариев:", error);
       });
+    await res.json(comments);
   } catch (error) {
     res.status(400);
     res.json(`Error`);
