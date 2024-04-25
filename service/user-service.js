@@ -171,6 +171,7 @@ class UserService {
       throw ApiError.BadRequest(`Неккоректный аккаунт id`);
     }
     user.description = data.description || user.description;
+    user.website = data.website || user.website;
     user.username = data.username || user.username;
     user.iconActive = data.iconActive || user.iconActive;
     user.private = data.private || user.private;
@@ -202,6 +203,16 @@ class UserService {
         }
       );
     }
+    await user.save();
+    return { user: user };
+  }
+
+  async changeIcon(data) {
+    let user = await User.findOne({ _id: data.id });
+    if (!user) {
+      throw ApiError.BadRequest(`Неккоректный аккаунт id`);
+    }
+    user.iconActive = data.iconActive || user.iconActive;
     await user.save();
     return { user: user };
   }

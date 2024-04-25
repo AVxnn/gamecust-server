@@ -4,6 +4,7 @@ export default class UserDto {
   isActivation;
   level;
   username;
+  website;
   private;
   description;
   subscribers;
@@ -16,6 +17,7 @@ export default class UserDto {
 
   constructor(model) {
     this.username = model.username;
+    this.website = model.website;
     this.email = model.email;
     this.description = model.description;
     this.id = model._id;

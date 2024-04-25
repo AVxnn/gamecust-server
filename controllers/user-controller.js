@@ -137,6 +137,17 @@ class UserController {
     }
   }
 
+  async changeIcon(req, res, next) {
+    try {
+      const { data } = req.body;
+      const userData = await userService.changeIcon(data);
+
+      return res.json(await userData);
+    } catch (error) {
+      next(error);
+    }
+  }
+
   async getUsers(req, res, next) {
     try {
       const users = await userService.getAllUsers();
