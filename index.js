@@ -69,52 +69,61 @@ async function start(PORT, UrlDB) {
   }
 }
 
-const w = schedule.scheduleJob("20 * * * * *", async function () {
+const job = schedule.scheduleJob('25 * * * *', async function () {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
+
   let posts = await Post.find({ published: true }).sort({ viewsCount: -1 });
+
   const result = posts.filter((post) => {
-    // Получение даты публикации поста без времени
+    // Getting the publication date of the post without time
     const postDate = new Date(+post.publishedDate);
     postDate.setHours(0, 0, 0, 0);
-    console.log(postDate.getTime(), today.getTime());
     return postDate.getTime() >= today.getTime();
   })[0];
-  posts.map(async (post, index) => {
-    if (post?.tags?.type !== "popular") {
-      let data = await Post.findOneAndUpdate(
-        { postId: post?.postId },
-        {
-          tags: [],
-        }
-      );
-    }
-  });
-  if (result?.postId && result?.tags?.type !== "popular") {
-    let data = await Post.findOneAndUpdate(
-      { postId: posts[0]?.postId },
-      {
-        tags: [
+
+  // Remove "popular" tag from all posts if they have it
+  await Promise.all(
+    posts.map(async (post) => {
+      if (post?.tags?.some(tag => tag.type === "popular")) {
+        await Post.findOneAndUpdate(
+          { postId: post?.postId },
           {
+            $pull: { tags: { type: "popular" } }
+          }
+        );
+      }
+    })
+  );
+
+  // Add "popular" tag to the most viewed post if it doesn't already have it
+  if (result?.postId && !result?.tags?.some(tag => tag.type === "popular")) {
+    await Post.findOneAndUpdate(
+      { postId: result.postId },
+      {
+        $addToSet: {
+          tags: {
             type: "popular",
             text: "Популярный",
-            color: "#F05353",
-          },
-        ],
+            color: "#F05353"
+          }
+        }
       }
     );
   }
-  if (result?.postId && result?.tags?.type !== "postday") {
-    let data = await Post.findOneAndUpdate(
-      { postId: result?.postId },
+
+  // Add "postday" tag to the most viewed post if it doesn't already have it
+  if (result?.postId && !result?.tags?.some(tag => tag.type === "postday")) {
+    await Post.findOneAndUpdate(
+      { postId: result.postId },
       {
-        tags: [
-          {
+        $addToSet: {
+          tags: {
             type: "postday",
             text: "Пост дня",
-            color: "#F05353",
-          },
-        ],
+            color: "#F05353"
+          }
+        }
       }
     );
   }
