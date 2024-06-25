@@ -5,6 +5,7 @@ import file from "./routes/file/file.js";
 import comments from "./routes/comments/comments.js";
 import level from "./routes/level/level.js";
 import auth from "./routes/auth/auth.js";
+import { createServer } from "http";
 import notification from "./routes/notification/notification.js";
 import search from "./routes/search/search.js";
 import categories from "./routes/categories/categories.js";
@@ -14,8 +15,10 @@ import cookieParser from "cookie-parser";
 import cors from "cors";
 import schedule from "node-schedule";
 import Post from "./models/post/post.js";
+import { Server } from "socket.io";
 import path, { dirname } from "path";
 import { fileURLToPath } from "url";
+import { socketPost } from "./sockets/socketPost.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -31,6 +34,7 @@ const corsConfig = {
   credentials: true,
   optionSuccessStatus: 200,
 };
+const server = createServer(app);
 
 app.use(cors(corsConfig));
 app.options("*", cors(corsConfig));
@@ -59,17 +63,24 @@ app.get("/", async (req, res) => {
   });
 });
 
+const io = new Server(server, {
+  path: "/socket", // Указываем путь для сокетных подключений
+  cors: process.env.CLIENT_URL,
+});
+
+socketPost(io);
+
 async function start(PORT, UrlDB) {
   try {
     console.log("Если не запускается проект, то скорее всего не включен VPN");
     await mongoose.connect(UrlDB);
-    app.listen(PORT, () => console.log("server start Port", PORT));
+    server.listen(PORT, () => console.log("server start Port", PORT));
   } catch (e) {
     console.log(e);
   }
 }
 
-const job = schedule.scheduleJob('25 * * * *', async function () {
+const job = schedule.scheduleJob("25 * * * *", async function () {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
@@ -85,11 +96,11 @@ const job = schedule.scheduleJob('25 * * * *', async function () {
   // Remove "popular" tag from all posts if they have it
   await Promise.all(
     posts.map(async (post) => {
-      if (post?.tags?.some(tag => tag.type === "popular")) {
+      if (post?.tags?.some((tag) => tag.type === "popular")) {
         await Post.findOneAndUpdate(
           { postId: post?.postId },
           {
-            $pull: { tags: { type: "popular" } }
+            $pull: { tags: { type: "popular" } },
           }
         );
       }
@@ -97,7 +108,7 @@ const job = schedule.scheduleJob('25 * * * *', async function () {
   );
 
   // Add "popular" tag to the most viewed post if it doesn't already have it
-  if (result?.postId && !result?.tags?.some(tag => tag.type === "popular")) {
+  if (result?.postId && !result?.tags?.some((tag) => tag.type === "popular")) {
     await Post.findOneAndUpdate(
       { postId: result.postId },
       {
@@ -105,15 +116,15 @@ const job = schedule.scheduleJob('25 * * * *', async function () {
           tags: {
             type: "popular",
             text: "Популярный",
-            color: "#F05353"
-          }
-        }
+            color: "#F05353",
+          },
+        },
       }
     );
   }
 
   // Add "postday" tag to the most viewed post if it doesn't already have it
-  if (result?.postId && !result?.tags?.some(tag => tag.type === "postday")) {
+  if (result?.postId && !result?.tags?.some((tag) => tag.type === "postday")) {
     await Post.findOneAndUpdate(
       { postId: result.postId },
       {
@@ -121,9 +132,9 @@ const job = schedule.scheduleJob('25 * * * *', async function () {
           tags: {
             type: "postday",
             text: "Пост дня",
-            color: "#F05353"
-          }
-        }
+            color: "#F05353",
+          },
+        },
       }
     );
   }

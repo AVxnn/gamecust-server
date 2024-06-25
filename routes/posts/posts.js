@@ -24,7 +24,6 @@ router.get("/post/getPost/:id", async (req, res) => {
       .populate("user")
       .populate("category")
       .exec();
-    console.log(post);
     await res.json(post);
   } catch (error) {
     res.status(404);
@@ -111,7 +110,6 @@ router.get("/post/getPosts/subs/:id/:page", async (req, res) => {
       .populate("user")
       .populate("category")
       .exec();
-    console.log(user, "posts", posts);
     await res.json(posts);
   } catch (error) {
     res.status(404);
@@ -233,7 +231,6 @@ router.get("/post/delete/:id", async (req, res) => {
       .populate("category")
       .exec();
     await Post.deleteOne({ postId: { $regex: new RegExp(`^${id}$`, "i") } });
-    console.log(post);
     if (post?.category) {
       const CategoriesQuery = await Categories.findOne({
         _id: post.category._id,
@@ -258,7 +255,6 @@ router.get("/post/delete/:id", async (req, res) => {
 // редактирование
 router.post("/post/update", async (req, res) => {
   const { data } = req.body;
-  console.log(data);
 
   try {
     const post = await Post.findOneAndUpdate(
@@ -308,7 +304,6 @@ router.post("/post/update", async (req, res) => {
 
 router.post("/post/updatedata", async (req, res) => {
   const { data } = req.body;
-  console.log("data?.category", data);
   try {
     const post = await Post.findOneAndUpdate(
       { postId: data.postId },
