@@ -67,7 +67,7 @@ const io = new Server(server, {
   path: "/socket", // Указываем путь для сокетных подключений
   cors: process.env.CLIENT_URL,
 });
-
+console.log(process.env.CLIENT_URL);
 socketPost(io);
 
 async function start(PORT, UrlDB) {
