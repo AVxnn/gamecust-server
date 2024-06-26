@@ -65,7 +65,12 @@ app.get("/", async (req, res) => {
 
 const io = new Server(server, {
   path: "/socket", // Указываем путь для сокетных подключений
-  cors: process.env.CLIENT_URL,
+  cors: {
+    origin: process.env.CLIENT_URL, // Замените на ваш клиентский домен
+    methods: ["GET", "POST"],
+    allowedHeaders: ["Content-Type"],
+    credentials: true,
+  },
 });
 console.log(process.env.CLIENT_URL);
 socketPost(io);
